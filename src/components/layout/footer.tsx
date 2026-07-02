@@ -81,8 +81,14 @@ export function Footer() {
           </div>
         </div>
 
-        <div className="mt-12 flex flex-col items-center justify-between gap-3 border-t border-stone-50/10 pt-6 text-xs text-stone-50/40 sm:flex-row">
+        <div className="mt-12 flex flex-col items-center justify-between gap-4 border-t border-stone-50/10 pt-6 text-xs text-stone-50/40 sm:flex-row">
           <span>© {new Date().getFullYear()} IQFIT47. All rights reserved.</span>
+          <div className="flex flex-wrap justify-center gap-x-6 gap-y-2">
+            <Link href="/policies/returns" className="hover:text-stone-50 transition-colors">Returns</Link>
+            <Link href="/policies/privacy" className="hover:text-stone-50 transition-colors">Privacy</Link>
+            <Link href="/policies/terms" className="hover:text-stone-50 transition-colors">Terms</Link>
+            <Link href="/policies/cookies" className="hover:text-stone-50 transition-colors">Cookies</Link>
+          </div>
           <span className="font-mono">DROP 015 — RESTOCK FRIDAY</span>
         </div>
       </div>
