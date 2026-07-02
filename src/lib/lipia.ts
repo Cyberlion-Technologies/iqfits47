@@ -14,7 +14,7 @@
  *   LIPIA_BASE_URL  — defaults to https://lipia-online.vercel.app
  */
 
-const LIPIA_BASE_URL = process.env.LIPIA_BASE_URL ?? "https://lipia-online.vercel.app";
+const LIPIA_BASE_URL = process.env.LIPIA_BASE_URL ?? "https://lipia-api.kreativelabske.com/api/v2";
 const LIPIA_API_KEY = process.env.LIPIA_API_KEY ?? "";
 
 export interface StkPushParams {
@@ -55,17 +55,23 @@ export async function initiateStkPush(
 ): Promise<StkPushResult> {
   assertConfigured();
 
-  const res = await fetch(`${LIPIA_BASE_URL}/api/request/stk`, {
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://iqfits47.top";
+  const callbackUrl = `${siteUrl}/api/payments/callback`;
+
+  const res = await fetch(`${LIPIA_BASE_URL}/payments/stk-push`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
       Authorization: `Bearer ${LIPIA_API_KEY}`,
     },
     body: JSON.stringify({
-      phone: params.phone,
+      phone_number: params.phone,
       amount: params.amount,
-      account_reference: params.accountReference,
-      transaction_desc: params.transactionDesc ?? "IQFIT47 order",
+      external_reference: params.accountReference,
+      callback_url: callbackUrl,
+      metadata: {
+        transaction_desc: params.transactionDesc ?? "IQFIT47 order",
+      }
     }),
     cache: "no-store",
   });
@@ -82,10 +88,13 @@ export async function initiateStkPush(
     };
   }
 
+  const success = data.success ?? (data.status === "success" || data.status === true);
+  const transactionRef = data.data?.TransactionReference ?? data.reference ?? data.CheckoutRequestID ?? data.id;
+
   return {
-    success: true,
-    reference: data.reference ?? data.CheckoutRequestID ?? data.id,
-    message: data.message ?? "STK push sent. Enter your M-Pesa PIN to complete payment.",
+    success: !!success,
+    reference: transactionRef,
+    message: data.customerMessage ?? data.message ?? "STK push sent. Enter your M-Pesa PIN to complete payment.",
     raw: data,
   };
 }
@@ -99,7 +108,7 @@ export async function checkTransactionStatus(
   assertConfigured();
 
   const res = await fetch(
-    `${LIPIA_BASE_URL}/api/request/status/${encodeURIComponent(reference)}`,
+    `${LIPIA_BASE_URL}/payments/status?reference=${encodeURIComponent(reference)}`,
     {
       headers: { Authorization: `Bearer ${LIPIA_API_KEY}` },
       cache: "no-store",
@@ -112,18 +121,26 @@ export async function checkTransactionStatus(
     return { success: false, status: "unknown", message: "Could not reach Lipia Online.", raw: data };
   }
 
-  const rawStatus = String(data.status ?? "").toLowerCase();
+  const rawStatus = String(data.data?.response?.Status ?? data.status ?? "").toLowerCase();
   let status: TransactionStatusResult["status"] = "unknown";
-  if (["success", "completed", "paid"].includes(rawStatus)) status = "success";
-  else if (["pending", "processing"].includes(rawStatus)) status = "pending";
-  else if (["failed", "error"].includes(rawStatus)) status = "failed";
-  else if (["cancelled", "canceled"].includes(rawStatus)) status = "cancelled";
+  
+  if (["success", "completed", "paid"].includes(rawStatus)) {
+    status = "success";
+  } else if (["pending", "processing"].includes(rawStatus)) {
+    status = "pending";
+  } else if (["failed", "error"].includes(rawStatus)) {
+    status = "failed";
+  } else if (["cancelled", "canceled"].includes(rawStatus)) {
+    status = "cancelled";
+  }
+
+  const success = data.success ?? (status === "success" || data.status === "success" || data.status === true);
 
   return {
-    success: true,
+    success: !!success,
     status,
-    mpesaReceipt: data.mpesa_receipt ?? data.MpesaReceiptNumber,
-    message: data.message ?? status,
+    mpesaReceipt: data.data?.response?.MpesaReceiptNumber ?? data.mpesa_receipt ?? data.MpesaReceiptNumber,
+    message: data.customerMessage ?? data.message ?? status,
     raw: data,
   };
 }

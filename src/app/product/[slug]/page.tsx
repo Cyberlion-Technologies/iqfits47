@@ -1,14 +1,35 @@
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
-import { Star } from "lucide-react";
-import { getProductBySlug, getRelatedProducts, products } from "@/lib/data/products";
-import { ProductGallery } from "@/components/product/product-gallery";
-import { AddToCartForm } from "@/components/product/add-to-cart-form";
-import { ProductCard } from "@/components/product/product-card";
+
+function StarIcon({ className, size = 14 }: { className?: string; size?: number }) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={className}
+    >
+      <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+    </svg>
+  );
+}
+import { getProductBySlug, getRelatedProducts, getDbProducts } from "@/lib/data/products";
+import dynamic from "next/dynamic";
+
+const ProductGallery = dynamic(() => import("@/components/product/product-gallery").then((m) => m.ProductGallery));
+const AddToCartForm = dynamic(() => import("@/components/product/add-to-cart-form").then((m) => m.AddToCartForm));
+const ProductCard = dynamic(() => import("@/components/product/product-card").then((m) => m.ProductCard));
 import { formatKES } from "@/lib/utils";
 
-export function generateStaticParams() {
-  return products.map((p) => ({ slug: p.slug }));
+export async function generateStaticParams() {
+  const list = await getDbProducts();
+  return list.map((p) => ({ slug: p.slug }));
 }
 
 export async function generateMetadata({
@@ -17,12 +38,39 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const product = getProductBySlug(slug);
+  const product = await getProductBySlug(slug);
   if (!product) return {};
+
+  const title = `${product.name} - ${product.brand} | IQFIT47`;
+  const description = `${product.description} Shop authentic ${product.brand} sneakers and streetwear at IQFIT47 Nairobi store. Next-day delivery.`;
+  const url = `https://iqfits47.top/product/${product.slug}`;
+
   return {
-    title: `${product.name} — ${product.brand}`,
-    description: product.description,
-    openGraph: { images: [product.images[0]] },
+    title,
+    description,
+    alternates: {
+      canonical: url,
+    },
+    openGraph: {
+      title,
+      description,
+      url,
+      type: "website",
+      images: [
+        {
+          url: product.images[0],
+          width: 800,
+          height: 800,
+          alt: product.name,
+        },
+      ],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      images: [product.images[0]],
+    },
   };
 }
 
@@ -32,13 +80,40 @@ export default async function ProductPage({
   params: Promise<{ slug: string }>;
 }) {
   const { slug } = await params;
-  const product = getProductBySlug(slug);
+  const product = await getProductBySlug(slug);
   if (!product) notFound();
 
-  const related = getRelatedProducts(product);
+  const related = await getRelatedProducts(product);
+
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    "name": product.name,
+    "image": product.images,
+    "description": product.description,
+    "brand": {
+      "@type": "Brand",
+      "name": product.brand,
+    },
+    "color": product.colorway,
+    "offers": {
+      "@type": "Offer",
+      "url": `https://iqfits47.top/product/${product.slug}`,
+      "priceCurrency": "KES",
+      "price": product.price,
+      "itemCondition": "https://schema.org/NewCondition",
+      "availability": product.sizes.some((s) => s.stock > 0)
+        ? "https://schema.org/InStock"
+        : "https://schema.org/OutOfStock",
+    },
+  };
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       <div className="grid gap-10 lg:grid-cols-2 lg:gap-16">
         <ProductGallery images={product.images} name={product.name} />
 
@@ -61,7 +136,7 @@ export default async function ProductPage({
 
           <div className="mt-2 flex items-center gap-1.5">
             {Array.from({ length: 5 }).map((_, i) => (
-              <Star
+              <StarIcon
                 key={i}
                 size={14}
                 className={i < Math.round(product.rating) ? "fill-hazard text-hazard" : "text-ink/15"}

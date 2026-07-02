@@ -1,8 +1,10 @@
 import { Suspense } from "react";
 import type { Metadata } from "next";
-import { products, categories } from "@/lib/data/products";
-import { ProductCard } from "@/components/product/product-card";
-import { ShopFilters } from "@/components/product/shop-filters";
+import { getDbProducts, categories } from "@/lib/data/products";
+import dynamic from "next/dynamic";
+
+const ProductCard = dynamic(() => import("@/components/product/product-card").then((m) => m.ProductCard));
+const ShopFilters = dynamic(() => import("@/components/product/shop-filters").then((m) => m.ShopFilters));
 import { Product } from "@/lib/types";
 
 export const metadata: Metadata = {
@@ -30,8 +32,9 @@ export default async function ShopPage({
   searchParams: Promise<{ category?: string; sort?: string }>;
 }) {
   const { category, sort } = await searchParams;
+  const productsList = await getDbProducts();
 
-  let filtered = products;
+  let filtered = productsList;
   if (category && category !== "all") {
     filtered = filtered.filter((p) => p.category === category);
   }

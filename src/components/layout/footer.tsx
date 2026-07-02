@@ -1,3 +1,5 @@
+"use client";
+
 import Link from "next/link";
 import { MapPin, Package } from "lucide-react";
 import { InstagramIcon } from "@/components/ui/instagram-icon";
@@ -50,7 +52,27 @@ export function Footer() {
                 </Link>
               </li>
               <li className="flex items-center gap-2 text-stone-50/60">
-                <MapPin size={14} /> Thika, Kiambu County
+                <MapPin size={14} /> Nairobi, Kenya
+              </li>
+              <li>
+                <a
+                  href="https://wa.me/254716672878"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-2 hover:text-hazard"
+                >
+                  <span className="font-mono text-xs text-stone-50/50">Phone/WA:</span> +254 716 672 878
+                </a>
+              </li>
+              <li>
+                <a
+                  href="https://chat.whatsapp.com/HKekz4fQhR8AQudjaP4qeH"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-2 hover:text-hazard text-stone-50/90"
+                >
+                  Join WhatsApp Community
+                </a>
               </li>
               <li className="pt-1 font-mono text-xs text-stone-50/50">
                 Payments secured via M-Pesa STK Push

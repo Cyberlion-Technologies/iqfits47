@@ -1,9 +1,11 @@
+"use client";
+
 import { ShieldCheck, Smartphone, Truck, PackageSearch } from "lucide-react";
 
 const items = [
   { icon: ShieldCheck, title: "100% Authentic", body: "Every pair checked before it ships." },
   { icon: Smartphone, title: "Pay with M-Pesa", body: "Secure STK push at checkout." },
-  { icon: Truck, title: "Nationwide delivery", body: "From Thika to anywhere in Kenya." },
+  { icon: Truck, title: "Nationwide delivery", body: "From Nairobi to anywhere in Kenya." },
   { icon: PackageSearch, title: "Track your order", body: "Real-time status, no login needed." },
 ];
 

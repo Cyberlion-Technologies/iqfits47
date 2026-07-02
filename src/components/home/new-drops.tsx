@@ -2,8 +2,8 @@ import Link from "next/link";
 import { ProductCard } from "@/components/product/product-card";
 import { getNewDrops } from "@/lib/data/products";
 
-export function NewDrops() {
-  const drops = getNewDrops();
+export async function NewDrops() {
+  const drops = await getNewDrops();
 
   return (
     <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">

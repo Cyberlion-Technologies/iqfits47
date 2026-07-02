@@ -1,10 +1,8 @@
 import type { Metadata, Viewport } from "next";
 import { Anton, Space_Grotesk, IBM_Plex_Mono } from "next/font/google";
 import "./globals.css";
-import { Navbar } from "@/components/layout/navbar";
 import { Footer } from "@/components/layout/footer";
-import { Toaster } from "sonner";
-import { CartDrawer } from "@/components/cart/cart-drawer";
+import { ClientWrapper } from "@/components/layout/client-wrapper";
 
 const display = Anton({
   subsets: ["latin"],
@@ -28,7 +26,7 @@ const mono = IBM_Plex_Mono({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://iqfit47.co.ke"),
+  metadataBase: new URL("https://iqfits47.top"),
   title: {
     default: "IQFIT47 — Kicks, Sneakers & Designer Fits",
     template: "%s | IQFIT47",
@@ -39,7 +37,7 @@ export const metadata: Metadata = {
     "sneakers Kenya",
     "kicks Nairobi",
     "designer clothing Kenya",
-    "streetwear Thika",
+    "streetwear Nairobi",
     "IQFIT47",
     "buy shoes online Kenya",
   ],
@@ -47,7 +45,7 @@ export const metadata: Metadata = {
     title: "IQFIT47 — Kicks, Sneakers & Designer Fits",
     description:
       "Authentic kicks and designer fits, delivered across Kenya. Pay with M-Pesa, track every order.",
-    url: "https://iqfit47.co.ke",
+    url: "https://iqfits47.top",
     siteName: "IQFIT47",
     locale: "en_KE",
     type: "website",
@@ -71,11 +69,10 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${display.variable} ${body.variable} ${mono.variable}`}>
       <body className="bg-stone-50 font-body text-ink antialiased">
-        <Navbar />
-        <main className="min-h-[60vh]">{children}</main>
+        <ClientWrapper>
+          {children}
+        </ClientWrapper>
         <Footer />
-        <CartDrawer />
-        <Toaster position="top-center" richColors closeButton />
       </body>
     </html>
   );

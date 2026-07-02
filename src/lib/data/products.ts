@@ -1,4 +1,5 @@
 import { Product } from "@/lib/types";
+import { supabase } from "@/lib/supabase/client";
 
 const sizesRun = (stockPattern: number[]): { size: string; stock: number }[] =>
   ["38", "39", "40", "41", "42", "43", "44"].map((size, i) => ({
@@ -298,15 +299,84 @@ export const products: Product[] = [
   },
 ];
 
-export const getProductBySlug = (slug: string) =>
-  products.find((p) => p.slug === slug);
+function mapDbProductToProduct(row: any): Product {
+  return {
+    id: row.id,
+    slug: row.slug,
+    name: row.name,
+    brand: row.brand,
+    category: row.category,
+    price: row.price,
+    compareAtPrice: row.compare_at_price ?? undefined,
+    description: row.description,
+    details: Array.isArray(row.details) ? row.details : JSON.parse(JSON.stringify(row.details || [])),
+    images: Array.isArray(row.images) ? row.images : JSON.parse(JSON.stringify(row.images || [])),
+    colorway: row.colorway,
+    sizes: Array.isArray(row.sizes) ? row.sizes : JSON.parse(JSON.stringify(row.sizes || [])),
+    tags: Array.isArray(row.tags) ? row.tags : JSON.parse(JSON.stringify(row.tags || [])),
+    isNewDrop: row.is_new_drop ?? undefined,
+    dropNumber: row.drop_number ?? undefined,
+    rating: Number(row.rating ?? 5.0),
+    reviewCount: row.review_count ?? 0,
+  };
+}
 
-export const getRelatedProducts = (product: Product, limit = 4) =>
-  products
+export async function getDbProducts(): Promise<Product[]> {
+  try {
+    const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+    if (!url || !key) return products;
+
+    const { data, error } = await supabase
+      .from("products")
+      .select("*")
+      .order("created_at", { ascending: false });
+
+    if (error || !data || data.length === 0) {
+      return products;
+    }
+
+    return data.map(mapDbProductToProduct);
+  } catch (e) {
+    console.error("Error fetching products from DB, falling back to static:", e);
+    return products;
+  }
+}
+
+export async function getProductBySlug(slug: string): Promise<Product | null> {
+  try {
+    const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+    if (!url || !key) return products.find((p) => p.slug === slug) ?? null;
+
+    const { data, error } = await supabase
+      .from("products")
+      .select("*")
+      .eq("slug", slug)
+      .maybeSingle();
+
+    if (error || !data) {
+      return products.find((p) => p.slug === slug) ?? null;
+    }
+
+    return mapDbProductToProduct(data);
+  } catch (e) {
+    console.error(`Error fetching product ${slug} from DB, falling back to static:`, e);
+    return products.find((p) => p.slug === slug) ?? null;
+  }
+}
+
+export async function getNewDrops(): Promise<Product[]> {
+  const all = await getDbProducts();
+  return all.filter((p) => p.isNewDrop);
+}
+
+export async function getRelatedProducts(product: Product, limit = 4): Promise<Product[]> {
+  const all = await getDbProducts();
+  return all
     .filter((p) => p.id !== product.id && p.category === product.category)
     .slice(0, limit);
-
-export const getNewDrops = () => products.filter((p) => p.isNewDrop);
+}
 
 export const categories: { id: Product["category"]; label: string; blurb: string }[] = [
   { id: "sneakers", label: "Kicks", blurb: "Sneakers worth queuing for" },

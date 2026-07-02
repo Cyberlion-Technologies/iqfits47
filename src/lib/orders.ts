@@ -6,7 +6,7 @@ const STATUS_LABELS: Record<OrderStatus, string> = {
   payment_pending: "Waiting for M-Pesa payment",
   paid: "Payment received",
   processing: "Order is being packed",
-  dispatched: "Dispatched from our Thika warehouse",
+  dispatched: "Dispatched from our Nairobi store",
   out_for_delivery: "Out for delivery",
   delivered: "Delivered",
   cancelled: "Order cancelled",
@@ -92,9 +92,13 @@ export async function attachTransactionReference(
     .eq("order_number", orderNumber);
 }
 
-export async function markOrderPaid(orderNumber: string, mpesaReceipt?: string) {
+export async function markOrderPaid(orderNumber: string, mpesaReceipt?: string): Promise<{ order: Order; newlyPaid: boolean } | null> {
   const order = await getOrderByNumber(orderNumber);
   if (!order) return null;
+
+  if (order.status !== "payment_pending") {
+    return { order, newlyPaid: false };
+  }
 
   const timeline = [...order.timeline, timelineEntry("paid"), timelineEntry("processing")];
 
@@ -106,22 +110,37 @@ export async function markOrderPaid(orderNumber: string, mpesaReceipt?: string) 
       timeline,
     })
     .eq("order_number", orderNumber)
+    .eq("status", "payment_pending")
     .select()
     .single();
 
-  if (error || !data) return null;
-  return rowToOrder(data);
+  if (error || !data) {
+    const refreshed = await getOrderByNumber(orderNumber);
+    return refreshed ? { order: refreshed, newlyPaid: false } : null;
+  }
+
+  return { order: rowToOrder(data), newlyPaid: true };
 }
 
-export async function updateOrderStatus(orderNumber: string, status: OrderStatus, note?: string) {
+export async function updateOrderStatus(
+  orderNumber: string,
+  status: OrderStatus,
+  note?: string,
+  mpesaReceipt?: string
+) {
   const order = await getOrderByNumber(orderNumber);
   if (!order) return null;
 
   const timeline = [...order.timeline, timelineEntry(status, note)];
 
+  const updatePayload: any = { status, timeline };
+  if (mpesaReceipt) {
+    updatePayload.mpesa_receipt = mpesaReceipt;
+  }
+
   const { data, error } = await supabaseServer
     .from("orders")
-    .update({ status, timeline })
+    .update(updatePayload)
     .eq("order_number", orderNumber)
     .select()
     .single();

@@ -1,11 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X, ShoppingBag, Search, Package } from "lucide-react";
 import { useCart } from "@/lib/store/cart";
 import { cn } from "@/lib/utils";
+import { supabase } from "@/lib/supabase/client";
 
 const links = [
   { href: "/shop", label: "Shop All" },
@@ -19,19 +20,44 @@ export function Navbar() {
   const openCart = useCart((s) => s.open);
   const count = useCart((s) => s.count());
 
+  const [announcements, setAnnouncements] = useState<string[]>([
+    "FREE DELIVERY IN NAIROBI & KIAMBU ON ORDERS OVER KES 15,000",
+    "PAY SECURELY WITH M-PESA",
+    "NEW DROPS EVERY FRIDAY",
+  ]);
+
+  useEffect(() => {
+    async function loadAnnouncements() {
+      try {
+        const { data, error } = await supabase
+          .from("announcements")
+          .select("message")
+          .eq("active", true)
+          .order("priority", { ascending: false });
+
+        if (data && data.length > 0) {
+          setAnnouncements(data.map((a: any) => a.message));
+        }
+      } catch {
+        // Fallback to defaults
+      }
+    }
+    loadAnnouncements();
+  }, []);
+
   return (
     <header className="sticky top-0 z-40 border-b border-ink/10 bg-stone-50/90 backdrop-blur">
       {/* running ticker */}
       <div className="overflow-hidden border-b border-ink/10 bg-ink text-stone-50">
         <div className="flex animate-marquee whitespace-nowrap py-1.5 text-[11px] font-medium tracking-wide">
-          {Array.from({ length: 2 }).map((_, i) => (
+          {Array.from({ length: 4 }).map((_, i) => (
             <div key={i} className="flex shrink-0 items-center gap-8 px-4">
-              <span>FREE DELIVERY IN NAIROBI &amp; KIAMBU ON ORDERS OVER KES 15,000</span>
-              <span className="text-hazard">•</span>
-              <span>PAY SECURELY WITH M-PESA</span>
-              <span className="text-hazard">•</span>
-              <span>NEW DROPS EVERY FRIDAY</span>
-              <span className="text-hazard">•</span>
+              {announcements.map((ann, idx) => (
+                <span key={`${idx}-${ann}`} className="flex items-center gap-8">
+                  <span>{ann}</span>
+                  <span className="text-hazard">•</span>
+                </span>
+              ))}
             </div>
           ))}
         </div>

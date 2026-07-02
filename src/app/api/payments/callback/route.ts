@@ -1,16 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { markOrderPaid } from "@/lib/orders";
 import { supabaseServer } from "@/lib/supabase/server";
+import { sendOrderConfirmationEmail, sendAdminNewOrderEmail } from "@/lib/mail";
 
 /**
- * Webhook receiver for Lipia Online payment callbacks, in case they
- * offer a CallBackURL setting on the app dashboard (recommended —
- * faster than polling). Point that setting to:
- *   https://yourdomain.co.ke/api/payments/callback
- *
- * We look up the order by the transaction reference Lipia sends back,
- * so field names here may need a small tweak once you can see a real
- * callback payload from the dashboard logs.
+ * Webhook receiver for Lipia Online payment callbacks.
  */
 export async function POST(req: NextRequest) {
   const payload = await req.json().catch(() => null);
@@ -38,7 +32,15 @@ export async function POST(req: NextRequest) {
   }
 
   if (["success", "completed", "paid"].includes(status)) {
-    await markOrderPaid(order.order_number, mpesaReceipt);
+    const result = await markOrderPaid(order.order_number, mpesaReceipt);
+    if (result && result.newlyPaid) {
+      try {
+        await sendOrderConfirmationEmail(result.order);
+        await sendAdminNewOrderEmail(result.order);
+      } catch (err) {
+        console.error("Failed to send notification emails in callback:", err);
+      }
+    }
   }
 
   return NextResponse.json({ received: true });
