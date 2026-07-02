@@ -14,7 +14,10 @@
  *   LIPIA_BASE_URL  — defaults to https://lipia-online.vercel.app
  */
 
-const LIPIA_BASE_URL = process.env.LIPIA_BASE_URL ?? "https://lipia-api.kreativelabske.com/api/v2";
+let LIPIA_BASE_URL = process.env.LIPIA_BASE_URL ?? "https://lipia-api.kreativelabske.com/api/v2";
+if (LIPIA_BASE_URL.includes("vercel.app")) {
+  LIPIA_BASE_URL = "https://lipia-api.kreativelabske.com/api/v2";
+}
 const LIPIA_API_KEY = process.env.LIPIA_API_KEY ?? "";
 
 export interface StkPushParams {

@@ -8,6 +8,7 @@ import { useCart } from "@/lib/store/cart";
 import { formatKES, isValidMpesaPhone } from "@/lib/utils";
 import { Order } from "@/lib/types";
 import { OrderTimeline } from "@/components/order/order-timeline";
+import { supabase } from "@/lib/supabase/client";
 
 const KENYAN_COUNTIES = [
   "Nairobi", "Kiambu", "Machakos", "Kajiado", "Nakuru", "Mombasa", "Kisumu",
@@ -38,6 +39,47 @@ export default function CheckoutPage() {
     notes: "",
   });
 
+  // Coupon states
+  const [couponCode, setCouponCode] = useState("");
+  const [appliedDiscount, setAppliedDiscount] = useState<{ code: string; percent: number } | null>(null);
+  const [isApplyingCoupon, setIsApplyingCoupon] = useState(false);
+  const [couponError, setCouponError] = useState("");
+
+  async function handleApplyCoupon() {
+    if (!couponCode.trim()) return;
+    setIsApplyingCoupon(true);
+    setCouponError("");
+
+    try {
+      const { data, error } = await supabase
+        .from("offers")
+        .select("*")
+        .eq("code", couponCode.trim().toUpperCase())
+        .eq("active", true)
+        .maybeSingle();
+
+      if (error || !data) {
+        setCouponError("Invalid or expired coupon code.");
+        setAppliedDiscount(null);
+      } else {
+        setAppliedDiscount({
+          code: data.code,
+          percent: data.discount_percent || 0,
+        });
+        setCouponCode("");
+      }
+    } catch {
+      setCouponError("Could not validate coupon. Please try again.");
+    } finally {
+      setIsApplyingCoupon(false);
+    }
+  }
+
+  function handleRemoveCoupon() {
+    setAppliedDiscount(null);
+    setCouponError("");
+  }
+
   useEffect(() => {
     return () => {
       if (pollRef.current) clearInterval(pollRef.current);
@@ -55,7 +97,8 @@ export default function CheckoutPage() {
 
   const deliveryFeeEstimate =
     subtotal >= 15000 ? 0 : /nairobi|kiambu/i.test(form.county) ? 300 : 500;
-  const total = subtotal + deliveryFeeEstimate;
+  const discountAmount = appliedDiscount ? Math.round((subtotal * appliedDiscount.percent) / 100) : 0;
+  const total = Math.max(0, subtotal - discountAmount) + deliveryFeeEstimate;
 
   function updateField<K extends keyof typeof form>(key: K, value: string) {
     setForm((f) => ({ ...f, [key]: value }));
@@ -91,6 +134,7 @@ export default function CheckoutPage() {
             price: l.price,
           })),
           delivery: form,
+          promoCode: appliedDiscount ? appliedDiscount.code : undefined,
         }),
       });
       const data = await res.json();
@@ -272,11 +316,61 @@ export default function CheckoutPage() {
                   </div>
                 ))}
               </div>
-              <div className="mt-4 space-y-1.5 border-t border-ink/15 pt-4 font-mono text-sm">
+
+              {/* Coupon Code Input */}
+              <div className="mt-6 border-t border-ink/15 pt-4">
+                <label className="block font-mono text-[10px] uppercase tracking-wide text-ink/50 mb-1.5">
+                  Coupon Code
+                </label>
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    value={couponCode}
+                    onChange={(e) => setCouponCode(e.target.value.toUpperCase())}
+                    placeholder="E.G. WELCOME10"
+                    className="input h-10 py-1 text-sm font-mono uppercase bg-transparent border border-ink/20 rounded-xl px-3 flex-1"
+                    disabled={!!appliedDiscount}
+                  />
+                  {appliedDiscount ? (
+                    <button
+                      type="button"
+                      onClick={handleRemoveCoupon}
+                      className="rounded-xl bg-ink/10 px-4 text-xs font-mono uppercase hover:bg-hazard hover:text-white transition-colors"
+                    >
+                      Remove
+                    </button>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={handleApplyCoupon}
+                      disabled={isApplyingCoupon || !couponCode}
+                      className="rounded-xl bg-ink px-4 text-xs font-mono uppercase text-stone-50 hover:bg-hazard disabled:opacity-50 transition-colors"
+                    >
+                      {isApplyingCoupon ? "..." : "Apply"}
+                    </button>
+                  )}
+                </div>
+                {couponError && (
+                  <p className="mt-1.5 text-xs text-hazard font-medium">{couponError}</p>
+                )}
+                {appliedDiscount && (
+                  <p className="mt-1.5 text-xs text-emerald-600 font-medium">
+                    Code {appliedDiscount.code} applied! ({appliedDiscount.percent}% off)
+                  </p>
+                )}
+              </div>
+
+              <div className="mt-6 space-y-1.5 border-t border-ink/15 pt-4 font-mono text-sm">
                 <div className="flex justify-between text-ink/60">
                   <span>Subtotal</span>
                   <span>{formatKES(subtotal)}</span>
                 </div>
+                {appliedDiscount && (
+                  <div className="flex justify-between text-emerald-600">
+                    <span>Discount (-{appliedDiscount.percent}%)</span>
+                    <span>-{formatKES(discountAmount)}</span>
+                  </div>
+                )}
                 <div className="flex justify-between text-ink/60">
                   <span>Delivery</span>
                   <span>{deliveryFeeEstimate === 0 ? "Free" : formatKES(deliveryFeeEstimate)}</span>

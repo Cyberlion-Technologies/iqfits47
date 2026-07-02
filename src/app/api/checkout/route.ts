@@ -3,6 +3,7 @@ import { createOrder, attachTransactionReference } from "@/lib/orders";
 import { initiateStkPush } from "@/lib/lipia";
 import { normalizeMpesaPhone } from "@/lib/utils";
 import { OrderItem } from "@/lib/types";
+import { supabaseServer } from "@/lib/supabase/server";
 
 const DELIVERY_FEE_NAIROBI = 300;
 const DELIVERY_FEE_OTHER = 500;
@@ -11,7 +12,7 @@ const FREE_DELIVERY_THRESHOLD = 15000;
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { items, delivery } = body as {
+    const { items, delivery, promoCode } = body as {
       items: OrderItem[];
       delivery: {
         fullName: string;
@@ -22,6 +23,7 @@ export async function POST(req: NextRequest) {
         addressLine: string;
         notes?: string;
       };
+      promoCode?: string;
     };
 
     if (!items?.length) {
@@ -50,14 +52,39 @@ export async function POST(req: NextRequest) {
           delivery.county.toLowerCase().includes("kiambu")
         ? DELIVERY_FEE_NAIROBI
         : DELIVERY_FEE_OTHER;
-    const total = subtotal + deliveryFee;
+
+    // Apply promo code discount if valid
+    let discountAmount = 0;
+    let discountPercent = 0;
+    let appliedPromoCode = null;
+
+    if (promoCode) {
+      const { data: offer, error: offerError } = await supabaseServer
+        .from("offers")
+        .select("*")
+        .eq("code", promoCode.trim().toUpperCase())
+        .eq("active", true)
+        .maybeSingle();
+
+      if (offer && !offerError) {
+        discountPercent = offer.discount_percent || 0;
+        discountAmount = Math.round((subtotal * discountPercent) / 100);
+        appliedPromoCode = offer.code;
+      }
+    }
+
+    const total = Math.max(0, subtotal - discountAmount) + deliveryFee;
 
     const order = await createOrder({
       items,
       subtotal,
       deliveryFee,
       total,
-      delivery: { ...delivery, phone: normalizedPhone },
+      delivery: {
+        ...delivery,
+        phone: normalizedPhone,
+        ...(appliedPromoCode ? { promoCode: appliedPromoCode, discountAmount, discountPercent } : {})
+      },
     });
 
     const stk = await initiateStkPush({
