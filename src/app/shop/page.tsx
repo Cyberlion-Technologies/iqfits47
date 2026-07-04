@@ -1,4 +1,4 @@
-﻿import { Suspense } from "react";
+import { Suspense } from "react";
 export const dynamic = "force-dynamic";
 import type { Metadata } from "next";
 import { getDbProducts, categories } from "@/lib/data/products";
@@ -30,18 +30,32 @@ function sortProducts(list: Product[], sort: string) {
 export default async function ShopPage({
   searchParams,
 }: {
-  searchParams: Promise<{ category?: string; sort?: string }>;
+  searchParams: Promise<{ category?: string; sort?: string; q?: string }>;
 }) {
-  const { category, sort } = await searchParams;
+  const { category, sort, q } = await searchParams;
   const productsList = await getDbProducts();
 
   let filtered = productsList;
   if (category && category !== "all") {
     filtered = filtered.filter((p) => p.category === category);
   }
+
+  if (q) {
+    const query = q.toLowerCase();
+    filtered = filtered.filter(
+      (p) =>
+        p.name.toLowerCase().includes(query) ||
+        p.brand.toLowerCase().includes(query) ||
+        (p.colorway && p.colorway.toLowerCase().includes(query)) ||
+        p.category.toLowerCase().includes(query)
+    );
+  }
+
   filtered = sortProducts(filtered, sort ?? "featured");
 
-  const activeLabel = categories.find((c) => c.id === category)?.label ?? "All Products";
+  const activeLabel = q 
+    ? `Search Results for "${q}"`
+    : (categories.find((c) => c.id === category)?.label ?? "All Products");
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">

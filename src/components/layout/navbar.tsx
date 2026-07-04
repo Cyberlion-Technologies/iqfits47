@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X, ShoppingBag, Search, Package, Heart } from "lucide-react";
 import { useCart } from "@/lib/store/cart";
@@ -18,6 +19,10 @@ const links = [
 
 export function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [searchVal, setSearchVal] = useState("");
+  const router = useRouter();
+
   const openCart = useCart((s) => s.open);
   const count = useCart((s) => s.count());
   const wishlistCount = useFeatures((s) => s.wishlist.length);
@@ -65,7 +70,49 @@ export function Navbar() {
         </div>
       </div>
 
-      <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-4 sm:px-6 lg:px-8">
+      <div className="relative mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-4 sm:px-6 lg:px-8">
+        <AnimatePresence>
+          {searchOpen && (
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.15 }}
+              className="absolute inset-x-0 inset-y-0 z-30 flex items-center bg-stone-50 px-4 sm:px-6 lg:px-8"
+            >
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  if (searchVal.trim()) {
+                    router.push(`/shop?q=${encodeURIComponent(searchVal.trim())}`);
+                    setSearchOpen(false);
+                    setSearchVal("");
+                  }
+                }}
+                className="flex w-full items-center gap-3"
+              >
+                <Search size={20} className="text-ink/50" />
+                <input
+                  type="text"
+                  placeholder="Search kicks, apparel, accessories..."
+                  value={searchVal}
+                  onChange={(e) => setSearchVal(e.target.value)}
+                  className="flex-1 bg-transparent py-2 font-mono text-sm tracking-wide focus:outline-none"
+                  autoFocus
+                />
+                <button
+                  type="button"
+                  onClick={() => setSearchOpen(false)}
+                  className="rounded-full p-2 hover:bg-ink/5"
+                  aria-label="Close search"
+                >
+                  <X size={20} />
+                </button>
+              </form>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
         <button
           className="rounded-full p-2 hover:bg-ink/5 lg:hidden"
           onClick={() => setMenuOpen(true)}
@@ -87,13 +134,13 @@ export function Navbar() {
         </nav>
 
         <div className="flex items-center gap-1">
-          <Link
-            href="/shop"
-            className="hidden rounded-full p-2 hover:bg-ink/5 sm:block"
+          <button
+            onClick={() => setSearchOpen(true)}
+            className="rounded-full p-2 hover:bg-ink/5"
             aria-label="Search products"
           >
             <Search size={20} />
-          </Link>
+          </button>
           <Link
             href="/track-order"
             className="hidden rounded-full p-2 hover:bg-ink/5 sm:block"
