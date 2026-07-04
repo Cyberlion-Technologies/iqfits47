@@ -64,7 +64,7 @@ export async function POST(req: NextRequest) {
 
     const { data, error: insertError } = await supabaseServer
       .from("products")
-      .insert(dbProducts)
+      .upsert(dbProducts, { onConflict: "slug" })
       .select();
 
     if (insertError) {
