@@ -565,6 +565,12 @@ export default function AdminDashboardPage() {
         </div>
         <div className="flex items-center gap-3">
           <button
+            onClick={() => handleSeedDatabase(true)}
+            className="flex items-center gap-1.5 rounded-full border border-hazard/30 bg-hazard/10 px-4 py-2 text-xs font-mono uppercase tracking-wide text-hazard hover:bg-hazard/20"
+          >
+            <Database size={12} /> Seed/Reset Products
+          </button>
+          <button
             onClick={() => loadAllData()}
             className="flex items-center gap-1.5 rounded-full border border-ink/10 bg-white px-4 py-2 text-xs font-mono uppercase tracking-wide hover:bg-stone-50"
           >

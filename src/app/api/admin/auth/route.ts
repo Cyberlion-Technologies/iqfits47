@@ -1,9 +1,9 @@
-﻿import { NextRequest, NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(req: NextRequest) {
   try {
     const { passcode } = await req.json();
-    const adminPasscode = process.env.ADMIN_PASSCODE ?? "IQFITS-47Admin";
+    const adminPasscode = process.env.ADMIN_PASSCODE ?? "IQFITS-47-ADMIN-2026";
 
     if (passcode === adminPasscode) {
       const response = NextResponse.json({ success: true, message: "Authentication successful." });
