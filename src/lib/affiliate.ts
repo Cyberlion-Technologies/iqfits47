@@ -1,4 +1,5 @@
 import { supabaseServer } from "@/lib/supabase/server";
+import { sendAdminReferralNotificationEmail } from "@/lib/mail";
 
 // ── Tier definitions ────────────────────────────────────────────────────────
 export const TIERS = [
@@ -129,10 +130,10 @@ export async function recordReferralEvent({
   orderTotalKes: number;
   discountGiven: number;
 }): Promise<void> {
-  // Look up current referral count to determine credit amount
+  // Look up current referral details to determine credit amount
   const { data: aff } = await supabaseServer
     .from("affiliates")
-    .select("referral_count")
+    .select("referral_code, display_name, referral_count")
     .eq("id", affiliateId)
     .single();
 
@@ -158,6 +159,16 @@ export async function recordReferralEvent({
     p_rank: newRank,
     p_count: newCount,
   });
+
+  // Send admin notification email
+  if (aff) {
+    sendAdminReferralNotificationEmail(
+      aff.referral_code,
+      aff.display_name || "Anonymous",
+      orderNumber,
+      credit
+    ).catch((err) => console.error("Failed to send referral email notification:", err));
+  }
 }
 
 /**

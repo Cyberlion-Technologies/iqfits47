@@ -5,12 +5,22 @@ import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import { ArrowRight, Sparkles } from "lucide-react";
 import { KENYA_COUNTY_PATHS } from "./kenya-map-paths";
+import { getDbProducts } from "@/lib/data/products";
 
-const FEATURED_SNEAKERS = [
+interface FeaturedSneaker {
+  name: string;
+  brand: string;
+  price: string;
+  image: string;
+  slug: string;
+  color: string;
+}
+
+const STATIC_FEATURED_SNEAKERS: FeaturedSneaker[] = [
   {
     name: "Airwave 97",
     brand: "Nike",
-    price: "KES 8,500",
+    price: "KES 6,500",
     image: "https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?w=1000&q=80",
     slug: "airwave-97-triple-white",
     color: "from-lime/10 to-transparent",
@@ -18,7 +28,7 @@ const FEATURED_SNEAKERS = [
   {
     name: "Cortez Flux",
     brand: "Nike",
-    price: "KES 7,200",
+    price: "KES 5,200",
     image: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=1000&q=80",
     slug: "cortez-flux-black-red",
     color: "from-hazard/10 to-transparent",
@@ -26,7 +36,7 @@ const FEATURED_SNEAKERS = [
   {
     name: "Streetform OG",
     brand: "Adidas",
-    price: "KES 9,800",
+    price: "KES 6,800",
     image: "https://images.unsplash.com/photo-1549298916-b41d501d3772?w=1000&q=80",
     slug: "streetform-og-cream",
     color: "from-cobalt/10 to-transparent",
@@ -34,24 +44,65 @@ const FEATURED_SNEAKERS = [
   {
     name: "Flux Runner",
     brand: "Adidas",
-    price: "KES 8,900",
-    image: "https://images.unsplash.com/photo-1606107557195-0e29a4b5b4aa?w=1000&q=80",
+    price: "KES 5,900",
+    image: "https://images.unsplash.com/photo-1597248881519-db089d3744a4?w=1000&q=80",
     slug: "flux-runner-cobalt",
     color: "from-hazard/15 to-transparent",
   }
 ];
 
 export function KenyaMapSlider() {
+  const [sneakers, setSneakers] = useState<FeaturedSneaker[]>([]);
   const [index, setIndex] = useState(0);
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      setIndex((prev) => (prev + 1) % FEATURED_SNEAKERS.length);
-    }, 5000);
-    return () => clearInterval(interval);
+    async function loadFeatured() {
+      try {
+        const allProducts = await getDbProducts();
+        const sneakerProducts = allProducts.filter((p) => p.category === "sneakers");
+        if (sneakerProducts.length > 0) {
+          const colors = [
+            "from-lime/10 to-transparent",
+            "from-hazard/10 to-transparent",
+            "from-cobalt/10 to-transparent",
+            "from-hazard/15 to-transparent",
+          ];
+          const mapped = sneakerProducts.map((p, idx) => ({
+            name: p.name,
+            brand: p.brand,
+            price: `KES ${p.price.toLocaleString()}`,
+            image: p.images[0] || "https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?w=1000&q=80",
+            slug: p.slug,
+            color: colors[idx % colors.length],
+          }));
+          setSneakers(mapped);
+          return;
+        }
+      } catch (err) {
+        console.error("Failed to fetch dynamic sneakers for map slider:", err);
+      }
+      setSneakers(STATIC_FEATURED_SNEAKERS);
+    }
+    loadFeatured();
   }, []);
 
-  const current = FEATURED_SNEAKERS[index];
+  useEffect(() => {
+    if (sneakers.length === 0) return;
+    const interval = setInterval(() => {
+      setIndex((prev) => (prev + 1) % sneakers.length);
+    }, 5000);
+    return () => clearInterval(interval);
+  }, [sneakers]);
+
+  if (sneakers.length === 0) {
+    return (
+      <div className="relative w-full max-w-[430px] mx-auto aspect-[458/580] flex items-center justify-center bg-ink/10 rounded-2xl border border-stone-50/10">
+        <span className="font-mono text-xs text-stone-50/40">Loading kicks...</span>
+      </div>
+    );
+  }
+
+  const current = sneakers[index];
 
   return (
     <div className="relative w-full max-w-[430px] mx-auto aspect-[458/580] flex flex-col justify-between">
@@ -121,7 +172,6 @@ export function KenyaMapSlider() {
             className="pointer-events-none transition-all duration-500 group-hover:stroke-hazard"
           >
             {KENYA_COUNTY_PATHS.map((p) => (
-              // Re-draw outer edges only, or draw all with thin glowing lines
               <path key={`glow-${p.id}`} d={p.d} strokeDasharray="3 20" className="animate-marquee" style={{ animationDuration: '40s' }} />
             ))}
           </g>
@@ -153,7 +203,7 @@ export function KenyaMapSlider() {
 
       {/* Indicator Dots */}
       <div className="flex justify-center gap-1.5 mt-3">
-        {FEATURED_SNEAKERS.map((_, i) => (
+        {sneakers.map((_, i) => (
           <button
             key={i}
             onClick={() => setIndex(i)}

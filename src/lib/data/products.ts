@@ -26,7 +26,7 @@ export const products: Product[] = [
     ],
     images: [
       "https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?w=1000&q=80",
-      "https://images.unsplash.com/photo-1600185365483-26d7a4cc7519?w=1000&q=80",
+      "https://images.unsplash.com/photo-1600185365483-26d7a4cc7519?w=1000&q=80"
     ],
     colorway: "Triple White",
     sizes: sizesRun([2, 4, 6, 8, 6, 3, 1]),
@@ -49,7 +49,7 @@ export const products: Product[] = [
     details: ["Mesh and synthetic upper", "Foam midsole", "Reinforced toe cap"],
     images: [
       "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=1000&q=80",
-      "https://images.unsplash.com/photo-1608231387042-66d1773070a5?w=1000&q=80",
+      "https://images.unsplash.com/photo-1606107557195-0e29a4b5b4aa?w=1000&q=80"
     ],
     colorway: "Black / Hazard Red",
     sizes: sizesRun([3, 5, 5, 7, 4, 2, 0]),
@@ -70,7 +70,7 @@ export const products: Product[] = [
     details: ["Suede overlays", "Rubber cupsole", "Padded collar"],
     images: [
       "https://images.unsplash.com/photo-1549298916-b41d501d3772?w=1000&q=80",
-      "https://images.unsplash.com/photo-1465453869711-7e174808ace9?w=1000&q=80",
+      "https://images.unsplash.com/photo-1465453869711-7e174808ace9?w=1000&q=80"
     ],
     colorway: "Cream / Gum",
     sizes: sizesRun([1, 3, 6, 6, 5, 3, 2]),
@@ -92,8 +92,8 @@ export const products: Product[] = [
       "Chunky trail-ready silhouette in storm grey with reflective accents. Built for weekend hikes around the Aberdares or Sunday errands in the CBD.",
     details: ["Water-resistant upper", "EVA midsole", "Reflective pull tabs"],
     images: [
-      "https://images.unsplash.com/photo-1560769629-975ec94e6a86?w=1000&q=80",
-      "https://images.unsplash.com/photo-1606107557195-0e29a4b5b4aa?w=1000&q=80",
+      "https://images.unsplash.com/photo-1539185441755-769473a23570?w=1000&q=80",
+      "https://images.unsplash.com/photo-1608231387042-66d1773070a5?w=1000&q=80"
     ],
     colorway: "Storm Grey",
     sizes: sizesRun([2, 2, 4, 5, 4, 3, 1]),
@@ -113,8 +113,8 @@ export const products: Product[] = [
       "Canvas high-top in navy with the original rubber toe cap. Simple, cheap to keep clean, and it goes with everything in your closet.",
     details: ["Canvas upper", "Vulcanized rubber sole", "Metal eyelets"],
     images: [
-      "https://images.unsplash.com/photo-1491553895911-0055eca6402d?w=1000&q=80",
-      "https://images.unsplash.com/photo-1518002171953-a080ee817e1f?w=1000&q=80",
+      "https://images.unsplash.com/photo-1607522370275-f14206abe5d3?w=1000&q=80",
+      "https://images.unsplash.com/photo-1594931984260-b74c8ecba2df?w=1000&q=80"
     ],
     colorway: "Navy",
     sizes: sizesRun([4, 6, 8, 8, 6, 4, 2]),
@@ -134,8 +134,8 @@ export const products: Product[] = [
       "Hazard-orange knit upper built for the daily commute. Breathable, light, and loud enough to spot from across the matatu stage.",
     details: ["Engineered knit upper", "Responsive foam sole", "Pull-tab heel"],
     images: [
-      "https://images.unsplash.com/photo-1552346154-21d32810aba3?w=1000&q=80",
-      "https://images.unsplash.com/photo-1556906781-9a412961c28c?w=1000&q=80",
+      "https://images.unsplash.com/photo-1515955656352-a1fa3ffcd111?w=1000&q=80",
+      "https://images.unsplash.com/photo-1552346154-21d32810aba3?w=1000&q=80"
     ],
     colorway: "Hazard Orange",
     sizes: sizesRun([3, 4, 5, 6, 4, 2, 1]),
@@ -156,8 +156,8 @@ export const products: Product[] = [
       "Heavyweight wool-blend body with faux-leather sleeves. Cut oversized for the layered look, lined for Nairobi's cold mornings.",
     details: ["Wool-blend body", "Faux-leather sleeves", "Ribbed cuffs and hem", "Quilted lining"],
     images: [
-      "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=1000&q=80",
-      "https://images.unsplash.com/photo-1556905055-8f358a7a47b2?w=1000&q=80",
+      "https://images.unsplash.com/photo-1620799140408-edc6dcb6d633?w=1000&q=80",
+      "https://images.unsplash.com/photo-1551028719-00167b16eac5?w=1000&q=80"
     ],
     colorway: "Ink Black",
     sizes: [
@@ -182,7 +182,7 @@ export const products: Product[] = [
     details: ["220gsm cotton", "Drop-shoulder fit", "Puff-print graphic"],
     images: [
       "https://images.unsplash.com/photo-1503341504253-dff4815485f1?w=1000&q=80",
-      "https://images.unsplash.com/photo-1521369909029-2afed882baee?w=1000&q=80",
+      "https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=1000&q=80"
     ],
     colorway: "Cream",
     sizes: [
@@ -208,8 +208,8 @@ export const products: Product[] = [
       "Ripstop cargo pants with six pockets and an adjustable waist. Tapered leg so they sit right over your kicks.",
     details: ["Ripstop cotton", "Six-pocket cargo build", "Adjustable waistband", "Tapered leg"],
     images: [
-      "https://images.unsplash.com/photo-1517438476312-10d79c077509?w=1000&q=80",
-      "https://images.unsplash.com/photo-1541099649105-f69ad21f3246?w=1000&q=80",
+      "https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?w=1000&q=80",
+      "https://images.unsplash.com/photo-1517438476312-10d79c077509?w=1000&q=80"
     ],
     colorway: "Olive",
     sizes: [
@@ -235,7 +235,7 @@ export const products: Product[] = [
     details: ["400gsm brushed fleece", "Kangaroo pocket", "Ribbed cuffs and hem"],
     images: [
       "https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=1000&q=80",
-      "https://images.unsplash.com/photo-1509942774463-acf339cf87d5?w=1000&q=80",
+      "https://images.unsplash.com/photo-1509942774463-acf339cf87d5?w=1000&q=80"
     ],
     colorway: "Slate Grey",
     sizes: [
@@ -257,7 +257,9 @@ export const products: Product[] = [
     price: 1500,
     description: "6-panel structured cap with an embroidered front logo and adjustable strap back.",
     details: ["Cotton twill", "Embroidered logo", "Adjustable strap"],
-    images: ["https://images.unsplash.com/photo-1521369909029-2afed882baee?w=1000&q=80"],
+    images: [
+      "https://images.unsplash.com/photo-1588850561407-ed78c282e89b?w=1000&q=80"
+    ],
     colorway: "Hazard Orange",
     sizes: [{ size: "One Size", stock: 20 }],
     tags: ["cap", "headwear"],
@@ -273,7 +275,9 @@ export const products: Product[] = [
     price: 1800,
     description: "Heavy canvas tote built to carry a fresh box of kicks without stretching out.",
     details: ["16oz canvas", "Reinforced base", "Interior pocket"],
-    images: ["https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=1000&q=80"],
+    images: [
+      "https://images.unsplash.com/photo-1544816155-12df9643f363?w=1000&q=80"
+    ],
     colorway: "Ink Black",
     sizes: [{ size: "One Size", stock: 15 }],
     tags: ["bag", "tote"],
@@ -292,8 +296,8 @@ export const products: Product[] = [
       "Electric cobalt overlays on a stone-grey knit base. Boost-style midsole for the days you're on your feet from Section 9 to the CBD and back.",
     details: ["Primeknit-style upper", "Boost-style midsole", "Torsion support"],
     images: [
-      "https://images.unsplash.com/photo-1606107557195-0e29a4b5b4aa?w=1000&q=80",
-      "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=1000&q=80",
+      "https://images.unsplash.com/photo-1597248881519-db089d3744a4?w=1000&q=80",
+      "https://images.unsplash.com/photo-1606107557195-0e29a4b5b4aa?w=1000&q=80"
     ],
     colorway: "Cobalt / Stone",
     sizes: sizesRun([2, 3, 5, 6, 5, 3, 1]),
@@ -323,7 +327,7 @@ export const products: Product[] = [
     ],
     images: [
       "https://images.unsplash.com/photo-1584735175315-9d5df23be388?w=1000&q=80",
-      "https://images.unsplash.com/photo-1556906781-9a412961c28c?w=1000&q=80",
+      "https://images.unsplash.com/photo-1552346154-21d32810aba3?w=1000&q=80"
     ],
     colorway: "Chicago Red / Black / White",
     sizes: sizesRun([1, 2, 3, 4, 3, 2, 1]),
@@ -351,8 +355,8 @@ export const products: Product[] = [
       "Herringbone rubber outsole",
     ],
     images: [
-      "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=1000&q=80",
-      "https://images.unsplash.com/photo-1600185365483-26d7a4cc7519?w=1000&q=80",
+      "https://images.unsplash.com/photo-1597045566677-8cf032ed6634?w=1000&q=80",
+      "https://images.unsplash.com/photo-1607853202273-797f1c22a38e?w=1000&q=80"
     ],
     colorway: "Bred — Black / Cement Grey / Fire Red",
     sizes: sizesRun([1, 2, 3, 4, 3, 2, 1]),
@@ -381,7 +385,7 @@ export const products: Product[] = [
     ],
     images: [
       "https://images.unsplash.com/photo-1552346154-21d32810aba3?w=1000&q=80",
-      "https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?w=1000&q=80",
+      "https://images.unsplash.com/photo-1600185365483-26d7a4cc7519?w=1000&q=80"
     ],
     colorway: "Panda — White / Black",
     sizes: sizesRun([2, 4, 5, 6, 5, 3, 2]),
@@ -409,8 +413,8 @@ export const products: Product[] = [
       "Gum rubber outsole",
     ],
     images: [
-      "https://images.unsplash.com/photo-1608231387042-66d1773070a5?w=1000&q=80",
-      "https://images.unsplash.com/photo-1549298916-b41d501d3772?w=1000&q=80",
+      "https://images.unsplash.com/photo-1586525198428-225f6f12cff5?w=1000&q=80",
+      "https://images.unsplash.com/photo-1556906781-9a412961c28c?w=1000&q=80"
     ],
     colorway: "Zebra — White / Core Black / Red",
     sizes: sizesRun([1, 2, 4, 5, 4, 3, 1]),
@@ -438,8 +442,8 @@ export const products: Product[] = [
       "NB logo at heel",
     ],
     images: [
-      "https://images.unsplash.com/photo-1560769629-975ec94e6a86?w=1000&q=80",
-      "https://images.unsplash.com/photo-1465453869711-7e174808ace9?w=1000&q=80",
+      "https://images.unsplash.com/photo-1608231387042-66d1773070a5?w=1000&q=80",
+      "https://images.unsplash.com/photo-1539185441755-769473a23570?w=1000&q=80"
     ],
     colorway: "White / Green",
     sizes: sizesRun([2, 3, 5, 6, 5, 4, 2]),
@@ -465,8 +469,8 @@ export const products: Product[] = [
       "Icy translucent outsole",
     ],
     images: [
-      "https://images.unsplash.com/photo-1491553895911-0055eca6402d?w=1000&q=80",
       "https://images.unsplash.com/photo-1518002171953-a080ee817e1f?w=1000&q=80",
+      "https://images.unsplash.com/photo-1511556532299-8f662fc26c06?w=1000&q=80"
     ],
     colorway: "Jubilee — Black / White / Silver",
     sizes: sizesRun([1, 2, 3, 4, 3, 2, 1]),
@@ -496,7 +500,7 @@ export const products: Product[] = [
     ],
     images: [
       "https://images.unsplash.com/photo-1503341504253-dff4815485f1?w=1000&q=80",
-      "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=1000&q=80",
+      "https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=1000&q=80"
     ],
     colorway: "Hazard Orange / Washed",
     sizes: [
@@ -529,8 +533,8 @@ export const products: Product[] = [
       "Side zip pockets",
     ],
     images: [
-      "https://images.unsplash.com/photo-1517438476312-10d79c077509?w=1000&q=80",
-      "https://images.unsplash.com/photo-1541099649105-f69ad21f3246?w=1000&q=80",
+      "https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?w=1000&q=80",
+      "https://images.unsplash.com/photo-1517438476312-10d79c077509?w=1000&q=80"
     ],
     colorway: "Ink Black / Lime",
     sizes: [
@@ -559,8 +563,8 @@ export const products: Product[] = [
       "Set of 3 pairs",
     ],
     images: [
-      "https://images.unsplash.com/photo-1556905055-8f358a7a47b2?w=1000&q=80",
-      "https://images.unsplash.com/photo-1521369909029-2afed882baee?w=1000&q=80",
+      "https://images.unsplash.com/photo-1582966772680-860e372bb558?w=1000&q=80",
+      "https://images.unsplash.com/photo-1606760227091-3dd870d97f1d?w=1000&q=80"
     ],
     colorway: "White / Hazard / Black",
     sizes: [{ size: "One Size", stock: 40 }],
@@ -588,8 +592,8 @@ export const products: Product[] = [
       "Zipper main compartment",
     ],
     images: [
-      "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=1000&q=80",
-      "https://images.unsplash.com/photo-1491553895911-0055eca6402d?w=1000&q=80",
+      "https://images.unsplash.com/photo-1590874103328-eac38a683ce7?w=1000&q=80",
+      "https://images.unsplash.com/photo-1622560480605-d83c853bc5c3?w=1000&q=80"
     ],
     colorway: "Ink Black",
     sizes: [{ size: "One Size", stock: 18 }],
@@ -617,8 +621,8 @@ export const products: Product[] = [
       "Non-marking rubber outsole",
     ],
     images: [
-      "https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?w=1000&q=80",
       "https://images.unsplash.com/photo-1600185365483-26d7a4cc7519?w=1000&q=80",
+      "https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?w=1000&q=80"
     ],
     colorway: "Triple White",
     sizes: sizesRun([2, 5, 8, 10, 8, 4, 2]),
@@ -645,8 +649,8 @@ export const products: Product[] = [
       "Translucent rubber outsole",
     ],
     images: [
-      "https://images.unsplash.com/photo-1608231387042-66d1773070a5?w=1000&q=80",
-      "https://images.unsplash.com/photo-1549298916-b41d501d3772?w=1000&q=80",
+      "https://images.unsplash.com/photo-1586525198428-225f6f12cff5?w=1000&q=80",
+      "https://images.unsplash.com/photo-1608231387042-66d1773070a5?w=1000&q=80"
     ],
     colorway: "Beluga Reflective",
     sizes: sizesRun([1, 3, 5, 7, 5, 3, 1]),
@@ -671,8 +675,8 @@ export const products: Product[] = [
       "Mesh underlays",
     ],
     images: [
-      "https://images.unsplash.com/photo-1560769629-975ec94e6a86?w=1000&q=80",
-      "https://images.unsplash.com/photo-1465453869711-7e174808ace9?w=1000&q=80",
+      "https://images.unsplash.com/photo-1539185441755-769473a23570?w=1000&q=80",
+      "https://images.unsplash.com/photo-1465453869711-7e174808ace9?w=1000&q=80"
     ],
     colorway: "Rain Cloud Grey",
     sizes: sizesRun([2, 4, 6, 7, 5, 3, 1]),
@@ -699,8 +703,8 @@ export const products: Product[] = [
       "Embossed Jumpman logo on heel tab",
     ],
     images: [
-      "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=1000&q=80",
-      "https://images.unsplash.com/photo-1600185365483-26d7a4cc7519?w=1000&q=80",
+      "https://images.unsplash.com/photo-1607853202273-797f1c22a38e?w=1000&q=80",
+      "https://images.unsplash.com/photo-1597045566677-8cf032ed6634?w=1000&q=80"
     ],
     colorway: "White / Military Black / Neutral Grey",
     sizes: sizesRun([1, 3, 5, 6, 5, 3, 2]),
@@ -729,7 +733,7 @@ export const products: Product[] = [
     ],
     images: [
       "https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=1000&q=80",
-      "https://images.unsplash.com/photo-1509942774463-acf339cf87d5?w=1000&q=80",
+      "https://images.unsplash.com/photo-1509942774463-acf339cf87d5?w=1000&q=80"
     ],
     colorway: "Ink Black",
     sizes: [
@@ -761,8 +765,8 @@ export const products: Product[] = [
       "Relaxed wide-leg opening",
     ],
     images: [
-      "https://images.unsplash.com/photo-1517438476312-10d79c077509?w=1000&q=80",
-      "https://images.unsplash.com/photo-1541099649105-f69ad21f3246?w=1000&q=80",
+      "https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?w=1000&q=80",
+      "https://images.unsplash.com/photo-1517438476312-10d79c077509?w=1000&q=80"
     ],
     colorway: "Olive Drab",
     sizes: [
@@ -792,8 +796,8 @@ export const products: Product[] = [
       "Pre-shrunk cotton fabric",
     ],
     images: [
-      "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=1000&q=80",
-      "https://images.unsplash.com/photo-1503341504253-dff4815485f1?w=1000&q=80",
+      "https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=1000&q=80",
+      "https://images.unsplash.com/photo-1503341504253-dff4815485f1?w=1000&q=80"
     ],
     colorway: "Cream White",
     sizes: [
@@ -824,7 +828,7 @@ export const products: Product[] = [
     ],
     images: [
       "https://images.unsplash.com/photo-1517438476312-10d79c077509?w=1000&q=80",
-      "https://images.unsplash.com/photo-1541099649105-f69ad21f3246?w=1000&q=80",
+      "https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?w=1000&q=80"
     ],
     colorway: "Slate Grey",
     sizes: [
@@ -858,7 +862,7 @@ export const products: Product[] = [
       "Adjustable plastic snapback enclosure",
     ],
     images: [
-      "https://images.unsplash.com/photo-1521369909029-2afed882baee?w=1000&q=80"
+      "https://images.unsplash.com/photo-1534215754734-18e55d13ce35?w=1000&q=80"
     ],
     colorway: "Ink Black / Off-White",
     sizes: [{ size: "One Size", stock: 25 }],
@@ -883,7 +887,7 @@ export const products: Product[] = [
       "Heavy-duty double lockable zippers",
     ],
     images: [
-      "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=1000&q=80"
+      "https://images.unsplash.com/photo-1600857544200-b2f666a9a2ec?w=1000&q=80"
     ],
     colorway: "Ink Black",
     sizes: [{ size: "One Size", stock: 12 }],

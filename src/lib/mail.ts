@@ -1,4 +1,4 @@
-﻿import { Order } from "@/lib/types";
+import { Order } from "@/lib/types";
 import { formatKES } from "@/lib/utils";
 
 const RESEND_API_KEY = process.env.RESEND_API_KEY || "";
@@ -69,6 +69,24 @@ export async function sendOrderConfirmationEmail(order: Order): Promise<boolean>
     )
     .join("");
 
+  const devDetails = (order.delivery || {}) as any;
+  let discountRow = "";
+  if (devDetails.discountAmount && devDetails.discountAmount > 0) {
+    discountRow = `
+      <tr>
+        <td style="padding: 4px 12px; color: #ef4444;">Promo Discount (${devDetails.discountPercent || 0}%)</td>
+        <td style="padding: 4px 12px; text-align: right; font-family: monospace; color: #ef4444;">-${formatKES(devDetails.discountAmount)}</td>
+      </tr>
+    `;
+  } else if (devDetails.referralDiscountAmount && devDetails.referralDiscountAmount > 0) {
+    discountRow = `
+      <tr>
+        <td style="padding: 4px 12px; color: #ef4444;">Referral Discount (${devDetails.referralDiscountPercent || 0}%)</td>
+        <td style="padding: 4px 12px; text-align: right; font-family: monospace; color: #ef4444;">-${formatKES(devDetails.referralDiscountAmount)}</td>
+      </tr>
+    `;
+  }
+
   const html = `
     <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; color: #1c1917; background-color: #fafaf9;">
       <div style="text-align: center; margin-bottom: 30px;">
@@ -87,6 +105,7 @@ export async function sendOrderConfirmationEmail(order: Order): Promise<boolean>
             <td style="padding: 12px 12px 4px 12px;">Subtotal</td>
             <td style="padding: 12px 12px 4px 12px; text-align: right; font-family: monospace;">${formatKES(order.subtotal)}</td>
           </tr>
+          ${discountRow}
           <tr>
             <td style="padding: 4px 12px 12px 12px; border-bottom: 1px solid #e5e7eb;">Delivery Fee</td>
             <td style="padding: 4px 12px 12px 12px; text-align: right; border-bottom: 1px solid #e5e7eb; font-family: monospace;">${formatKES(order.deliveryFee)}</td>
@@ -238,3 +257,43 @@ export async function sendOrderStatusUpdateEmail(order: Order, note?: string): P
     html,
   });
 }
+
+/**
+ * Notifies the store admin about a successful referral event.
+ */
+export async function sendAdminReferralNotificationEmail(
+  affiliateCode: string,
+  affiliateName: string,
+  orderNumber: string,
+  creditAwarded: number
+): Promise<boolean> {
+  const html = `
+    <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; color: #1c1917; background-color: #fafaf9;">
+      <div style="text-align: center; margin-bottom: 30px;">
+        <h1 style="font-size: 28px; margin: 0; letter-spacing: -0.05em; text-transform: uppercase;">IQFITS-47</h1>
+        <p style="font-size: 14px; color: #10b981; margin: 5px 0 0 0; font-family: monospace; letter-spacing: 0.1em;">REFERRAL COMPLETED</p>
+      </div>
+
+      <div style="background-color: #ffffff; border-radius: 16px; padding: 24px; border: 1px solid #e7e5e4;">
+        <p style="margin-top: 0;">Hey Admin,</p>
+        <p>A referral event was successfully completed!</p>
+        <p>Affiliate <strong>${affiliateName}</strong> (Code: <strong>${affiliateCode}</strong>) referred order <strong>${orderNumber}</strong>.</p>
+        
+        <div style="background-color: #f0fdf4; border-radius: 12px; padding: 16px; margin: 20px 0; text-align: center; border: 1px solid #bbf7d0;">
+          <span style="font-size: 16px; font-weight: bold; color: #15803d;">Credit Awarded: ${formatKES(creditAwarded)}</span>
+        </div>
+      </div>
+
+      <div style="text-align: center; margin-top: 30px; font-size: 12px; color: #78716c;">
+        <p>IQFITS-47 Store · Nairobi, Kenya</p>
+      </div>
+    </div>
+  `;
+
+  return sendEmail({
+    to: ADMIN_EMAIL,
+    subject: `[REFERRAL SUCCESS] ${affiliateCode} referred ${orderNumber} [IQFITS-47]`,
+    html,
+  });
+}
+
