@@ -1091,6 +1091,167 @@ export default function AdminDashboardPage() {
             </div>
           </div>
         )}
+
+        {activeTab === "referrals" && (
+          <div className="space-y-8">
+            {/* Referral Stats Grid */}
+            {affiliateStats && (
+              <div className="grid gap-4 grid-cols-2 lg:grid-cols-4">
+                <div className="rounded-2xl border border-ink/5 bg-stone-100 p-5">
+                  <div className="flex items-center justify-between text-ink/40">
+                    <span className="font-mono text-xs uppercase tracking-wider">Total Affiliates</span>
+                    <Users size={18} className="text-hazard" />
+                  </div>
+                  <p className="mt-2 text-3xl font-semibold tracking-tight">{affiliateStats.totalAffiliates}</p>
+                  <span className="text-[10px] text-ink/40 font-mono">Registered numbers</span>
+                </div>
+
+                <div className="rounded-2xl border border-ink/5 bg-stone-100 p-5">
+                  <div className="flex items-center justify-between text-ink/40">
+                    <span className="font-mono text-xs uppercase tracking-wider">Total Referrals</span>
+                    <Activity size={18} className="text-hazard" />
+                  </div>
+                  <p className="mt-2 text-3xl font-semibold tracking-tight">{affiliateStats.totalReferrals}</p>
+                  <span className="text-[10px] text-ink/40 font-mono">Orders referred</span>
+                </div>
+
+                <div className="rounded-2xl border border-ink/5 bg-stone-100 p-5">
+                  <div className="flex items-center justify-between text-ink/40">
+                    <span className="font-mono text-xs uppercase tracking-wider">Total Credit Paid</span>
+                    <DollarSign size={18} className="text-hazard" />
+                  </div>
+                  <p className="mt-2 text-3xl font-semibold tracking-tight">KES {affiliateStats.totalCreditIssued.toLocaleString()}</p>
+                  <span className="text-[10px] text-ink/40 font-mono">Total cash rewards</span>
+                </div>
+
+                <div className="rounded-2xl border border-ink/5 bg-stone-100 p-5">
+                  <div className="flex items-center justify-between text-ink/40">
+                    <span className="font-mono text-xs uppercase tracking-wider">Pending Credit</span>
+                    <Gift size={18} className="text-hazard" />
+                  </div>
+                  <p className="mt-2 text-3xl font-semibold tracking-tight">KES {affiliateStats.pendingCredit.toLocaleString()}</p>
+                  <span className="text-[10px] text-ink/40 font-mono">Unpaid credits</span>
+                </div>
+              </div>
+            )}
+
+            <div className="grid gap-6 lg:grid-cols-3">
+              {/* Left Column: Affiliates List */}
+              <div className="lg:col-span-2 space-y-4">
+                <div className="flex items-center justify-between">
+                  <h2 className="font-display text-xl uppercase tracking-tight">Affiliates Directory</h2>
+                  {/* Search Bar */}
+                  <div className="flex items-center gap-2 rounded-xl border border-ink/10 px-3 py-1.5 bg-white text-xs w-60">
+                    <Search size={14} className="text-ink/30" />
+                    <input
+                      value={affiliateQuery}
+                      onChange={(e) => setAffiliateQuery(e.target.value)}
+                      placeholder="Search name, phone, code..."
+                      className="w-full outline-none"
+                    />
+                  </div>
+                </div>
+
+                <div className="overflow-x-auto rounded-2xl border border-ink/10 bg-white">
+                  <table className="w-full border-collapse text-left text-sm">
+                    <thead>
+                      <tr className="border-b border-ink/10 bg-stone-50 font-mono text-[10px] uppercase text-ink/50">
+                        <th className="px-4 py-3">Affiliate Details</th>
+                        <th className="px-4 py-3">Code</th>
+                        <th className="px-4 py-3">Rank</th>
+                        <th className="px-4 py-3 text-right">Referrals</th>
+                        <th className="px-4 py-3 text-right">Total Credit</th>
+                        <th className="px-4 py-3 text-right">Pending</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-ink/5">
+                      {affiliates.filter(a => 
+                        a.display_name.toLowerCase().includes(affiliateQuery.toLowerCase()) ||
+                        a.phone.includes(affiliateQuery) ||
+                        a.referral_code.toLowerCase().includes(affiliateQuery.toLowerCase())
+                      ).length === 0 ? (
+                        <tr>
+                          <td colSpan={6} className="px-4 py-8 text-center text-ink/40 font-mono text-xs">
+                            No affiliates found.
+                          </td>
+                        </tr>
+                      ) : (
+                        affiliates.filter(a => 
+                          a.display_name.toLowerCase().includes(affiliateQuery.toLowerCase()) ||
+                          a.phone.includes(affiliateQuery) ||
+                          a.referral_code.toLowerCase().includes(affiliateQuery.toLowerCase())
+                        ).map((aff) => (
+                          <tr key={aff.id} className="hover:bg-stone-50/50 text-xs">
+                            <td className="px-4 py-3">
+                              <div className="font-semibold text-ink">{aff.display_name || "No Name"}</div>
+                              <div className="text-[10px] text-ink/40 font-mono">{aff.phone}</div>
+                            </td>
+                            <td className="px-4 py-3 font-mono font-semibold text-hazard">
+                              {aff.referral_code}
+                            </td>
+                            <td className="px-4 py-3">
+                              <span className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[9px] font-mono font-semibold uppercase tracking-wider ${RANK_COLOR[aff.rank] || RANK_COLOR.none}`}>
+                                {RANK_ICON[aff.rank] || RANK_ICON.none}
+                                {aff.rank === "none" ? "None" : aff.rank}
+                              </span>
+                            </td>
+                            <td className="px-4 py-3 text-right font-mono font-semibold">
+                              {aff.referral_count}
+                            </td>
+                            <td className="px-4 py-3 text-right font-mono">
+                              KES {aff.total_credit_kes.toLocaleString()}
+                            </td>
+                            <td className="px-4 py-3 text-right font-mono text-amber-600 font-semibold">
+                              KES {aff.pending_credit_kes.toLocaleString()}
+                            </td>
+                          </tr>
+                        ))
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              {/* Right Column: Recent Referral Events */}
+              <div className="space-y-4">
+                <h2 className="font-display text-xl uppercase tracking-tight">Recent Referral Events</h2>
+                <div className="rounded-2xl border border-ink/10 bg-white p-4 space-y-3 h-[450px] overflow-y-auto">
+                  {referralEvents.length === 0 ? (
+                    <div className="py-12 text-center text-ink/40 font-mono text-xs">
+                      No referral events logged yet.
+                    </div>
+                  ) : (
+                    referralEvents.map((evt) => {
+                      const parentAff = affiliates.find(a => a.id === evt.affiliate_id);
+                      return (
+                        <div key={evt.id} className="border-b border-ink/5 pb-3 last:border-0 last:pb-0">
+                          <div className="flex justify-between items-start">
+                            <div>
+                              <div className="font-semibold text-xs text-ink">
+                                Order {evt.order_number}
+                              </div>
+                              <div className="text-[9px] text-ink/40 font-mono">
+                                Referred by {parentAff ? `${parentAff.display_name} (${parentAff.referral_code})` : "Unknown"}
+                              </div>
+                            </div>
+                            <div className="text-right">
+                              <div className="font-mono text-xs font-semibold text-green-600">
+                                +KES {evt.credit_awarded}
+                              </div>
+                              <div className="text-[9px] text-ink/40 font-mono">
+                                Value: KES {evt.order_total_kes.toLocaleString()}
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Product Add/Edit Modal Form */}
