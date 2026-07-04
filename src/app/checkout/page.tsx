@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { Smartphone, Loader2, CheckCircle2, XCircle, ArrowLeft } from "lucide-react";
+import { Smartphone, Loader2, CheckCircle2, XCircle, ArrowLeft, Gift } from "lucide-react";
 import { useCart } from "@/lib/store/cart";
 import { formatKES, isValidMpesaPhone } from "@/lib/utils";
 import { Order } from "@/lib/types";
@@ -38,6 +38,21 @@ export default function CheckoutPage() {
     addressLine: "",
     notes: "",
   });
+
+  // Referral code (captured from ?ref= query param via localStorage)
+  const [referralCode, setReferralCode] = useState<string | null>(null);
+
+  useEffect(() => {
+    // Capture ?ref= from URL into localStorage
+    const params = new URLSearchParams(window.location.search);
+    const ref = params.get("ref");
+    if (ref) {
+      localStorage.setItem("iqf_ref", ref.toUpperCase());
+    }
+    // Read stored ref
+    const stored = localStorage.getItem("iqf_ref");
+    if (stored) setReferralCode(stored);
+  }, []);
 
   // Coupon states
   const [couponCode, setCouponCode] = useState("");
@@ -98,7 +113,11 @@ export default function CheckoutPage() {
   const deliveryFeeEstimate =
     subtotal >= 15000 ? 0 : /nairobi|kiambu/i.test(form.county) ? 300 : 500;
   const discountAmount = appliedDiscount ? Math.round((subtotal * appliedDiscount.percent) / 100) : 0;
-  const total = Math.max(0, subtotal - discountAmount) + deliveryFeeEstimate;
+  // Referral gives 5% — only if no promo code is active
+  const referralDiscountAmount =
+    referralCode && !appliedDiscount ? Math.round((subtotal * 5) / 100) : 0;
+  const effectiveDiscount = appliedDiscount ? discountAmount : referralDiscountAmount;
+  const total = Math.max(0, subtotal - effectiveDiscount) + deliveryFeeEstimate;
 
   function updateField<K extends keyof typeof form>(key: K, value: string) {
     setForm((f) => ({ ...f, [key]: value }));
@@ -135,6 +154,8 @@ export default function CheckoutPage() {
           })),
           delivery: form,
           promoCode: appliedDiscount ? appliedDiscount.code : undefined,
+          // Pass referral code only if no promo code is active
+          referralCode: !appliedDiscount && referralCode ? referralCode : undefined,
         }),
       });
       const data = await res.json();
@@ -148,6 +169,10 @@ export default function CheckoutPage() {
       setOrder(data.order);
       setPhase("awaiting-payment");
       startPolling(data.order.orderNumber);
+      // Clear ref from localStorage after it has been used
+      if (!appliedDiscount && referralCode && data.referralApplied) {
+        localStorage.removeItem("iqf_ref");
+      }
     } catch {
       setErrorMsg("Couldn't reach the server. Check your connection and try again.");
       setPhase("failed");
@@ -360,6 +385,16 @@ export default function CheckoutPage() {
                 )}
               </div>
 
+              {/* Referral discount badge */}
+              {referralCode && !appliedDiscount && (
+                <div className="mt-4 flex items-center gap-2 rounded-xl border border-emerald-200 bg-emerald-50 px-3 py-2.5">
+                  <Gift size={13} className="text-emerald-600 flex-shrink-0" />
+                  <p className="text-xs text-emerald-700 font-medium">
+                    Referral code <span className="font-mono">{referralCode}</span> — 5% off applied!
+                  </p>
+                </div>
+              )}
+
               <div className="mt-6 space-y-1.5 border-t border-ink/15 pt-4 font-mono text-sm">
                 <div className="flex justify-between text-ink/60">
                   <span>Subtotal</span>
@@ -369,6 +404,12 @@ export default function CheckoutPage() {
                   <div className="flex justify-between text-emerald-600">
                     <span>Discount (-{appliedDiscount.percent}%)</span>
                     <span>-{formatKES(discountAmount)}</span>
+                  </div>
+                )}
+                {referralCode && !appliedDiscount && referralDiscountAmount > 0 && (
+                  <div className="flex justify-between text-emerald-600">
+                    <span>Referral discount (-5%)</span>
+                    <span>-{formatKES(referralDiscountAmount)}</span>
                   </div>
                 )}
                 <div className="flex justify-between text-ink/60">
@@ -381,6 +422,7 @@ export default function CheckoutPage() {
                 </div>
               </div>
             </div>
+
           </motion.div>
         ) : phase === "awaiting-payment" ? (
           <motion.div

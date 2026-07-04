@@ -4,15 +4,17 @@ import { initiateStkPush } from "@/lib/lipia";
 import { normalizeMpesaPhone } from "@/lib/utils";
 import { OrderItem } from "@/lib/types";
 import { supabaseServer } from "@/lib/supabase/server";
+import { lookupAffiliateByCode, recordReferralEvent } from "@/lib/affiliate";
 
 const DELIVERY_FEE_NAIROBI = 300;
 const DELIVERY_FEE_OTHER = 500;
 const FREE_DELIVERY_THRESHOLD = 15000;
+const REFERRAL_DISCOUNT_PERCENT = 5; // 5% off for referred customers
 
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { items, delivery, promoCode } = body as {
+    const { items, delivery, promoCode, referralCode } = body as {
       items: OrderItem[];
       delivery: {
         fullName: string;
@@ -24,6 +26,7 @@ export async function POST(req: NextRequest) {
         notes?: string;
       };
       promoCode?: string;
+      referralCode?: string;
     };
 
     if (!items?.length) {
@@ -53,7 +56,7 @@ export async function POST(req: NextRequest) {
         ? DELIVERY_FEE_NAIROBI
         : DELIVERY_FEE_OTHER;
 
-    // Apply promo code discount if valid
+    // ── Promo code discount ──────────────────────────────────────────────────
     let discountAmount = 0;
     let discountPercent = 0;
     let appliedPromoCode = null;
@@ -73,6 +76,25 @@ export async function POST(req: NextRequest) {
       }
     }
 
+    // ── Referral code discount ───────────────────────────────────────────────
+    let referralAffiliate = null;
+    let referralDiscountAmount = 0;
+
+    if (referralCode && !promoCode) {
+      // Only apply referral discount if no promo code already applied
+      const affiliate = await lookupAffiliateByCode(referralCode);
+      if (affiliate) {
+        // Make sure the customer isn't referring themselves
+        const customerNormalized = normalizeMpesaPhone(delivery.phone);
+        if (affiliate.phone !== customerNormalized) {
+          referralAffiliate = affiliate;
+          referralDiscountAmount = Math.round((subtotal * REFERRAL_DISCOUNT_PERCENT) / 100);
+          discountAmount = referralDiscountAmount;
+          discountPercent = REFERRAL_DISCOUNT_PERCENT;
+        }
+      }
+    }
+
     const total = Math.max(0, subtotal - discountAmount) + deliveryFee;
 
     const order = await createOrder({
@@ -83,7 +105,16 @@ export async function POST(req: NextRequest) {
       delivery: {
         ...delivery,
         phone: normalizedPhone,
-        ...(appliedPromoCode ? { promoCode: appliedPromoCode, discountAmount, discountPercent } : {})
+        ...(appliedPromoCode
+          ? { promoCode: appliedPromoCode, discountAmount, discountPercent }
+          : {}),
+        ...(referralAffiliate
+          ? {
+              referralCode: referralAffiliate.referral_code,
+              referralDiscountAmount,
+              referralDiscountPercent: REFERRAL_DISCOUNT_PERCENT,
+            }
+          : {}),
       },
     });
 
@@ -109,7 +140,27 @@ export async function POST(req: NextRequest) {
       await attachTransactionReference(order.orderNumber, stk.reference);
     }
 
-    return NextResponse.json({ order, payment: stk });
+    // ── Record referral event (fire-and-forget after STK success) ────────────
+    if (referralAffiliate) {
+      recordReferralEvent({
+        affiliateId: referralAffiliate.id,
+        orderNumber: order.orderNumber,
+        orderTotalKes: total,
+        discountGiven: referralDiscountAmount,
+      }).catch((err) => console.error("Referral event record failed:", err));
+    }
+
+    return NextResponse.json({
+      order,
+      payment: stk,
+      referralApplied: referralAffiliate
+        ? {
+            code: referralAffiliate.referral_code,
+            discountPercent: REFERRAL_DISCOUNT_PERCENT,
+            discountAmount: referralDiscountAmount,
+          }
+        : null,
+    });
   } catch (err) {
     console.error("Checkout error:", err);
     return NextResponse.json(

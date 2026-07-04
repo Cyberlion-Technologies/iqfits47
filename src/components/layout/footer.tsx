@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { MapPin, Package } from "lucide-react";
+import { MapPin, Package, Gift } from "lucide-react";
 import { InstagramIcon } from "@/components/ui/instagram-icon";
 
 export function Footer() {
@@ -46,6 +46,15 @@ export function Footer() {
               Support
             </h3>
             <ul className="mt-4 space-y-2.5 text-sm text-stone-50/80">
+              <li>
+                <Link href="/referral" className="flex items-center gap-2 hover:text-hazard">
+                  <Gift size={14} />
+                  Refer &amp; Earn
+                  <span className="ml-0.5 inline-block rounded-full bg-hazard px-1.5 py-0.5 font-mono text-[8px] font-bold uppercase tracking-widest text-white leading-none">
+                    NEW
+                  </span>
+                </Link>
+              </li>
               <li>
                 <Link href="/track-order" className="flex items-center gap-2 hover:text-hazard">
                   <Package size={14} /> Track your order
