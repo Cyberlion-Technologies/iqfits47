@@ -38,14 +38,6 @@ export function Footer() {
               <li><Link href="/shop?category=apparel" className="hover:text-hazard">Apparel</Link></li>
               <li><Link href="/shop?category=accessories" className="hover:text-hazard">Accessories</Link></li>
               <li><Link href="/shop" className="hover:text-hazard">New Drops</Link></li>
-            </ul>
-          </div>
-
-          <div>
-            <h3 className="font-display text-sm uppercase tracking-widest text-stone-50/50">
-              Support
-            </h3>
-            <ul className="mt-4 space-y-2.5 text-sm text-stone-50/80">
               <li>
                 <Link href="/referral" className="flex items-center gap-2 hover:text-hazard">
                   <Gift size={14} />
@@ -55,6 +47,14 @@ export function Footer() {
                   </span>
                 </Link>
               </li>
+            </ul>
+          </div>
+
+          <div>
+            <h3 className="font-display text-sm uppercase tracking-widest text-stone-50/50">
+              Support
+            </h3>
+            <ul className="mt-4 space-y-2.5 text-sm text-stone-50/80">
               <li>
                 <Link href="/track-order" className="flex items-center gap-2 hover:text-hazard">
                   <Package size={14} /> Track your order

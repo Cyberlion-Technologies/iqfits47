@@ -6,6 +6,7 @@ import { InstagramCta } from "@/components/home/instagram-cta";
 
 const Hero = nextDynamic(() => import("@/components/home/hero").then((m) => m.Hero));
 const NewDrops = nextDynamic(() => import("@/components/home/new-drops").then((m) => m.NewDrops));
+const TopReferrer = nextDynamic(() => import("@/components/home/top-referrer").then((m) => m.TopReferrer));
 
 export default function HomePage() {
   return (
@@ -14,6 +15,7 @@ export default function HomePage() {
       <TrustStrip />
       <NewDrops />
       <CategoryShelf />
+      <TopReferrer />
       <InstagramCta />
     </>
   );

@@ -9,6 +9,7 @@ import {
 import { isValidMpesaPhone } from "@/lib/utils";
 import { TIERS } from "@/lib/affiliate";
 import type { Rank } from "@/lib/affiliate";
+import { ReferralNetworkViz } from "@/components/home/referral-network-viz";
 
 // ── Constants ────────────────────────────────────────────────────────────────
 const SITE_URL = "https://iqfits47.top";
@@ -146,17 +147,21 @@ export default function ReferralPage() {
             backgroundSize: "12px 12px",
           }}
         />
-        <div className="relative mx-auto max-w-7xl px-4 py-20 sm:px-6 lg:px-8">
+        {/* Background noise */}
+        <div className="pointer-events-none absolute inset-0 bg-grain opacity-[0.03]" />
+
+        <div className="relative mx-auto grid max-w-7xl items-center gap-8 px-4 pb-14 pt-10 sm:px-6 lg:grid-cols-12 lg:gap-4 lg:px-8 lg:pb-0 lg:pt-0">
+          {/* Left: Text content */}
           <motion.div
             initial={{ opacity: 0, y: 24 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
-            className="max-w-2xl"
+            className="relative z-10 lg:col-span-7 lg:py-24"
           >
             <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-hazard/30 bg-hazard/10 px-3 py-1.5 text-xs font-mono uppercase tracking-widest text-hazard">
-              <Gift size={12} /> Refer & Earn
+              <Gift size={12} /> Refer &amp; Earn
             </div>
-            <h1 className="font-display text-5xl uppercase tracking-tight sm:text-6xl lg:text-7xl">
+            <h1 className="font-display text-[14vw] leading-[0.85] tracking-tight sm:text-6xl lg:text-7xl">
               Share the<br />
               <span className="text-hazard">Fit.</span> Earn<br />
               the Bag.
@@ -177,6 +182,18 @@ export default function ReferralPage() {
                   <div className="mt-0.5 font-display text-sm text-hazard">{s.value}</div>
                 </div>
               ))}
+            </div>
+          </motion.div>
+
+          {/* Right: Animated network visualization */}
+          <motion.div
+            initial={{ opacity: 0, scale: 0.92 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.7, delay: 0.15, ease: [0.16, 1, 0.3, 1] }}
+            className="relative z-10 lg:col-span-5 w-full flex items-center justify-center py-6 lg:py-0"
+          >
+            <div className="w-full max-w-[420px] aspect-[4/4.5] lg:aspect-[1/1.2]">
+              <ReferralNetworkViz />
             </div>
           </motion.div>
         </div>
