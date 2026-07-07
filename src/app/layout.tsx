@@ -4,6 +4,7 @@ import "./globals.css";
 import { Footer } from "@/components/layout/footer";
 import { ClientWrapper } from "@/components/layout/client-wrapper";
 import { StructuredData } from "@/components/layout/structured-data";
+import { Analytics } from "@vercel/analytics/next";
 
 const display = Anton({
   subsets: ["latin"],
@@ -288,6 +289,7 @@ export default function RootLayout({
           {children}
         </ClientWrapper>
         <Footer />
+        <Analytics />
       </body>
     </html>
   );
