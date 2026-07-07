@@ -22,47 +22,21 @@ const Github = ({ size = 20, ...props }: { size?: number } & React.SVGProps<SVGS
 
 export function DeveloperCTA() {
   const [isOpen, setIsOpen] = useState(false);
-  const [currentIndex, setCurrentIndex] = useState(0);
-
-  const texts = [
-    "DROP 015 — RESTOCK FRIDAY",
-    "⚡ BUILT BY SIR. BRIAN & CO.",
-    "💬 TALK TO THE DEVELOPER ↗",
-  ];
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentIndex((prev) => (prev + 1) % texts.length);
-    }, 4500);
-    return () => clearInterval(interval);
-  }, [texts.length]);
 
   return (
     <>
       <button
         onClick={() => setIsOpen(true)}
-        className="group relative flex items-center gap-2 overflow-hidden rounded-full border border-stone-50/10 bg-ink px-4 py-2 font-mono text-[10px] tracking-wider text-stone-50/50 transition-all duration-300 hover:border-hazard hover:text-stone-50 hover:shadow-[0_0_15px_rgba(255,90,31,0.25)]"
+        className="group relative flex items-center gap-2 overflow-hidden rounded-full border border-hazard bg-ink px-4 py-2 font-mono text-[10px] font-bold uppercase tracking-wider text-hazard transition-all duration-300 hover:bg-hazard hover:text-stone-50 hover:shadow-[0_0_20px_rgba(255,90,31,0.45)]"
       >
         <span className="relative flex h-2 w-2 shrink-0">
           <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-hazard opacity-75"></span>
           <span className="relative inline-flex h-2 w-2 rounded-full bg-hazard"></span>
         </span>
-
-        {/* Text sliding wrapper */}
-        <div className="relative h-4 overflow-hidden w-[180px] text-left">
-          <AnimatePresence mode="wait">
-            <motion.span
-              key={currentIndex}
-              initial={{ y: 12, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              exit={{ y: -12, opacity: 0 }}
-              transition={{ duration: 0.3, ease: "easeInOut" }}
-              className="absolute inset-0 block truncate font-mono uppercase"
-            >
-              {texts[currentIndex]}
-            </motion.span>
-          </AnimatePresence>
-        </div>
+        <span>TALK TO THE DEVELOPER</span>
+        <span className="inline-block transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5">
+          ↗
+        </span>
       </button>
 
       <AnimatePresence>
