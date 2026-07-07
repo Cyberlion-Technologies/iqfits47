@@ -122,7 +122,7 @@ export function Navbar() {
         </button>
 
         <Link href="/" className="flex items-center gap-2.5 font-display text-2xl tracking-tight">
-          {/* Redesigned Premium Sneaker Logo Icon */}
+          {/* Jay Fletcher Style Geometric Sneaker Logo */}
           <svg
             xmlns="http://www.w3.org/2000/svg"
             viewBox="0 0 32 24"
@@ -131,38 +131,46 @@ export function Navbar() {
             aria-hidden="true"
             className="shrink-0 text-ink"
           >
-            {/* Upper body */}
+            {/* Sawtooth Outsole */}
             <path
-              d="M 2 17 C 2 14.5, 3.5 13.5, 5 13.5 L 13 10.5 L 16.5 5.5 C 17.5 4, 19.5 4, 20.5 5.5 L 21.5 8 C 22.5 7, 24 7, 25.5 8 L 27 9.5 C 28.5 10.5, 29 12, 29 14 L 29 17 Z"
-              fill="currentColor"
+              d="M 2 21 L 4 23 L 6 21 L 8 23 L 10 21 L 12 23 L 14 21 L 16 23 L 18 21 L 20 23 L 22 21 L 24 23 L 26 21 L 28 23 L 30 21"
+              stroke="currentColor"
+              strokeWidth="1.2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
             />
-            {/* Chunky Sole */}
+            {/* Midsole */}
             <path
-              d="M 1.5 17.5 L 29.5 17.5 C 30.5 17.5, 30.5 19, 29.5 19.5 L 28.5 21.5 C 27.5 22.5, 26 22.5, 25 22.5 L 6 22.5 C 4.5 22.5, 3 21.5, 2 19.5 Z"
+              d="M 2 18.5 L 30 18.5 C 30.5 18.5, 30.5 21, 29.5 21 L 2.5 21 C 1.5 21, 1.5 18.5, 2 18.5 Z"
               fill="#ffffff"
               stroke="currentColor"
               strokeWidth="1.2"
             />
-            {/* Swoosh/Stripe Accent */}
+            {/* Midsole Accent Stripe (Orange) */}
             <path
-              d="M 11 14 Q 18.5 11.5, 25.5 13"
-              stroke="#FF5A1F"
-              strokeWidth="2"
-              strokeLinecap="round"
-            />
-            {/* Sole stripe */}
-            <line
-              x1="5.5"
-              y1="19.5"
-              x2="25.5"
-              y2="19.5"
+              d="M 12 20 L 28 20"
               stroke="#FF5A1F"
               strokeWidth="1.2"
               strokeLinecap="round"
             />
-            {/* Lacing dots */}
-            <circle cx="14.5" cy="9.5" r="0.8" fill="#D4FF3D" />
-            <circle cx="17" cy="11" r="0.8" fill="#D4FF3D" />
+            {/* Upper Body (Base layer) */}
+            <path
+              d="M 2.5 18.5 C 2.5 15.5, 4 14.5, 5.5 14.5 L 13 11 L 16.5 6 C 17.5 4.5, 19 4.5, 20 6 L 21.5 8.5 C 22.5 7.5, 24 7.5, 25 8.5 L 26.5 10 C 28 11, 28.5 12.5, 28.5 14.5 L 28.5 18.5 Z"
+              fill="currentColor"
+            />
+            {/* Classic Swoosh */}
+            <path
+              d="M 8.5 16 C 13 13, 21 13, 27 10 C 27 10, 27.5 11, 26.5 12.5 C 21.5 15, 14 17.5, 9.5 17.5 Z"
+              fill="#FF5A1F"
+            />
+            {/* Heel Tab (Orange) */}
+            <path
+              d="M 25 8.5 C 26 7.5, 27 8.5, 27 9.5 L 25.5 10.5 Z"
+              fill="#FF5A1F"
+            />
+            {/* Laces */}
+            <line x1="12" y1="12" x2="15" y2="10" stroke="#D4FF3D" strokeWidth="1.5" strokeLinecap="round" />
+            <line x1="14" y1="10.2" x2="17" y2="8.2" stroke="#D4FF3D" strokeWidth="1.5" strokeLinecap="round" />
           </svg>
           IQFITS-<span className="text-hazard">47</span>
         </Link>
