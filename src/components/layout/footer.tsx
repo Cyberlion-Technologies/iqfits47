@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { MapPin, Package, Gift, Mail } from "lucide-react";
 import { InstagramIcon } from "@/components/ui/instagram-icon";
+import { DeveloperCTA } from "./developer-cta";
 
 export function Footer() {
   return (
@@ -119,7 +120,7 @@ export function Footer() {
             <Link href="/policies/terms" className="hover:text-stone-50 transition-colors">Terms</Link>
             <Link href="/policies/cookies" className="hover:text-stone-50 transition-colors">Cookies</Link>
           </div>
-          <span className="font-mono">DROP 015 — RESTOCK FRIDAY</span>
+          <DeveloperCTA />
         </div>
       </div>
     </footer>
