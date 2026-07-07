@@ -122,18 +122,18 @@ export function Navbar() {
         </button>
 
         <Link href="/" className="flex items-center gap-3 group">
-          {/* Double neon-lime diagonal slashes prefix */}
+          {/* Double hazard orange diagonal slashes prefix */}
           <div className="flex gap-1 -skew-x-12 shrink-0">
-            <div className="h-5 w-1 bg-lime transition-all duration-300 group-hover:scale-y-110" />
-            <div className="h-5 w-1 bg-lime transition-all duration-300 group-hover:scale-y-110" />
+            <div className="h-6 w-1 bg-hazard transition-all duration-300 group-hover:scale-y-110" />
+            <div className="h-6 w-1 bg-hazard transition-all duration-300 group-hover:scale-y-110" />
           </div>
           
           <div className="flex flex-col justify-center leading-none">
-            <div className="font-display text-2xl uppercase tracking-tighter text-ink">
+            <div className="font-display text-3xl uppercase tracking-tighter text-ink">
               IQFITS-<span className="text-hazard">47</span>
             </div>
-            <span className="font-body text-[8px] tracking-[0.18em] uppercase text-ink/50 mt-0.5 font-medium">
-              Kicks • Streetwear • Designer Fits
+            <span className="font-body text-[8px] tracking-[0.18em] uppercase text-ink/50 mt-1 font-semibold">
+              KICKS • STREETWEAR • DESIGNER FITS
             </span>
           </div>
         </Link>

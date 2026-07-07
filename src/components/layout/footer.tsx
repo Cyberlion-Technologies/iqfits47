@@ -11,18 +11,18 @@ export function Footer() {
         <div className="grid gap-10 md:grid-cols-4">
           <div className="md:col-span-2">
             <div className="flex items-center gap-3.5 group">
-              {/* Double neon-lime diagonal slashes prefix */}
+              {/* Double hazard orange diagonal slashes prefix */}
               <div className="flex gap-1.5 -skew-x-12 shrink-0">
-                <div className="h-7 w-1.5 bg-lime transition-all duration-300 group-hover:scale-y-110" />
-                <div className="h-7 w-1.5 bg-lime transition-all duration-300 group-hover:scale-y-110" />
+                <div className="h-8 w-1.5 bg-hazard transition-all duration-300 group-hover:scale-y-110" />
+                <div className="h-8 w-1.5 bg-hazard transition-all duration-300 group-hover:scale-y-110" />
               </div>
               
               <div className="flex flex-col justify-center leading-none">
-                <div className="font-display text-3xl uppercase tracking-tighter text-stone-50">
+                <div className="font-display text-4xl uppercase tracking-tighter text-stone-50">
                   IQFITS-<span className="text-hazard">47</span>
                 </div>
-                <span className="font-body text-[9px] tracking-[0.18em] uppercase text-stone-50/50 mt-1 font-medium">
-                  Kicks • Streetwear • Designer Fits
+                <span className="font-body text-[10px] tracking-[0.18em] uppercase text-stone-50/50 mt-1 font-semibold">
+                  KICKS • STREETWEAR • DESIGNER FITS
                 </span>
               </div>
             </div>
