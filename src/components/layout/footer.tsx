@@ -10,63 +10,48 @@ export function Footer() {
       <div className="mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8">
         <div className="grid gap-10 md:grid-cols-4">
           <div className="md:col-span-2">
-            <div className="flex items-center gap-2 font-display text-3xl tracking-tight">
-              {/* Sneaker icon — side-profile low-top, brand colours */}
+            <div className="flex items-center gap-2.5 font-display text-3xl tracking-tight">
+              {/* Redesigned Premium Sneaker Logo Icon */}
               <svg
                 xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 48 32"
-                width="42"
+                viewBox="0 0 32 24"
+                width="38"
                 height="28"
                 aria-hidden="true"
-                className="shrink-0"
+                className="shrink-0 text-stone-50"
               >
-                {/* Midsole / sole */}
+                {/* Upper body */}
                 <path
-                  d="M2 24 Q2 28 6 28 L42 28 Q46 28 46 25 L46 23 L2 23 Z"
-                  fill="#ffffff"
-                  stroke="#15151A"
+                  d="M 2 17 C 2 14.5, 3.5 13.5, 5 13.5 L 13 10.5 L 16.5 5.5 C 17.5 4, 19.5 4, 20.5 5.5 L 21.5 8 C 22.5 7, 24 7, 25.5 8 L 27 9.5 C 28.5 10.5, 29 12, 29 14 L 29 17 Z"
+                  fill="currentColor"
+                />
+                {/* Chunky Sole */}
+                <path
+                  d="M 1.5 17.5 L 29.5 17.5 C 30.5 17.5, 30.5 19, 29.5 19.5 L 28.5 21.5 C 27.5 22.5, 26 22.5, 25 22.5 L 6 22.5 C 4.5 22.5, 3 21.5, 2 19.5 Z"
+                  fill="#15151A"
+                  stroke="currentColor"
                   strokeWidth="1.2"
                 />
-                {/* Orange accent stripe on sole */}
+                {/* Swoosh/Stripe Accent */}
                 <path
-                  d="M3 24.5 L45 24.5"
+                  d="M 11 14 Q 18.5 11.5, 25.5 13"
                   stroke="#FF5A1F"
                   strokeWidth="2"
                   strokeLinecap="round"
                 />
-                {/* Upper body — toe box */}
-                <path
-                  d="M4 23 Q4 12 10 10 L28 8 L36 10 Q42 12 44 18 L44 23 Z"
-                  fill="#15151A"
-                />
-                {/* Toe cap highlight */}
-                <path
-                  d="M5 22 Q5 14 11 12 L20 10.5"
-                  fill="none"
-                  stroke="#2B2B33"
-                  strokeWidth="1.5"
-                  strokeLinecap="round"
-                />
-                {/* Collar / ankle opening */}
-                <path
-                  d="M36 10 Q44 8 46 14 L46 23 L44 23 L44 18 Q42 12 36 10 Z"
-                  fill="#1F1F26"
-                />
-                {/* Heel tab — orange accent */}
-                <rect x="42" y="10" width="3" height="8" rx="1.5" fill="#FF5A1F" />
-                {/* Lace area — three dashes */}
-                <line x1="14" y1="14" x2="22" y2="13" stroke="#D4FF3D" strokeWidth="1.2" strokeLinecap="round" />
-                <line x1="14" y1="17" x2="24" y2="15.5" stroke="#D4FF3D" strokeWidth="1.2" strokeLinecap="round" />
-                <line x1="14" y1="20" x2="26" y2="18.5" stroke="#D4FF3D" strokeWidth="1.2" strokeLinecap="round" />
-                {/* Swoosh-style accent stripe */}
-                <path
-                  d="M10 21 Q20 15 34 12"
-                  fill="none"
+                {/* Sole stripe */}
+                <line
+                  x1="5.5"
+                  y1="19.5"
+                  x2="25.5"
+                  y2="19.5"
                   stroke="#FF5A1F"
-                  strokeWidth="1.8"
+                  strokeWidth="1.2"
                   strokeLinecap="round"
-                  opacity="0.7"
                 />
+                {/* Lacing dots */}
+                <circle cx="14.5" cy="9.5" r="0.8" fill="#D4FF3D" />
+                <circle cx="17" cy="11" r="0.8" fill="#D4FF3D" />
               </svg>
               <span>IQFITS-<span className="text-hazard">47</span></span>
             </div>

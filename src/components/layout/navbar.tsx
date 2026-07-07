@@ -121,104 +121,48 @@ export function Navbar() {
           <Menu size={22} />
         </button>
 
-        <Link href="/" className="flex items-center gap-2 font-display text-2xl tracking-tight">
-          {/* Sneaker logo — detailed side-profile low-top illustration, brand colours */}
+        <Link href="/" className="flex items-center gap-2.5 font-display text-2xl tracking-tight">
+          {/* Redesigned Premium Sneaker Logo Icon */}
           <svg
             xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 64 44"
-            width="48"
-            height="33"
-            aria-label="IQFITS-47 sneaker logo"
-            className="shrink-0"
+            viewBox="0 0 32 24"
+            width="32"
+            height="24"
+            aria-hidden="true"
+            className="shrink-0 text-ink"
           >
-            {/* ── Outsole (thick rubber base) ─────────────────── */}
+            {/* Upper body */}
             <path
-              d="M3 32 Q2 38 7 39 L56 39 Q61 39 62 35 L62 31 Z"
-              fill="#F5F5F0"
-              stroke="#15151A"
-              strokeWidth="1"
+              d="M 2 17 C 2 14.5, 3.5 13.5, 5 13.5 L 13 10.5 L 16.5 5.5 C 17.5 4, 19.5 4, 20.5 5.5 L 21.5 8 C 22.5 7, 24 7, 25.5 8 L 27 9.5 C 28.5 10.5, 29 12, 29 14 L 29 17 Z"
+              fill="currentColor"
             />
-            {/* Orange midsole stripe */}
-            <path d="M3.5 33 L61.5 33" stroke="#FF5A1F" strokeWidth="2.2" strokeLinecap="round" />
-            {/* Heel curvature detail */}
-            <path d="M56 39 Q62 39 62 34" fill="none" stroke="#E0DDD5" strokeWidth="1" />
-
-            {/* ── Main upper body ─────────────────────────────── */}
+            {/* Chunky Sole */}
             <path
-              d="M5 31 Q5 16 13 13 L35 10 L48 13 Q56 16 59 24 L59 31 Z"
-              fill="#15151A"
-            />
-
-            {/* ── Toe box panel (lighter shade, subtle depth) ── */}
-            <path
-              d="M5 31 Q5 17 13 14 L24 11.5 Q14 15 13 28 Z"
-              fill="#1E1E24"
-            />
-            {/* Toe cap stitching line */}
-            <path
-              d="M7 30 Q7 19 14 16 L21 13.5"
-              fill="none"
-              stroke="#2D2D36"
+              d="M 1.5 17.5 L 29.5 17.5 C 30.5 17.5, 30.5 19, 29.5 19.5 L 28.5 21.5 C 27.5 22.5, 26 22.5, 25 22.5 L 6 22.5 C 4.5 22.5, 3 21.5, 2 19.5 Z"
+              fill="#ffffff"
+              stroke="currentColor"
               strokeWidth="1.2"
-              strokeLinecap="round"
-              strokeDasharray="2 1.5"
             />
-
-            {/* ── Quarter / side panel ────────────────────────── */}
+            {/* Swoosh/Stripe Accent */}
             <path
-              d="M24 11.5 L48 13 Q56 16 59 24 L59 31 L13 31 Q13 18 24 11.5 Z"
-              fill="#1A1A21"
-            />
-
-            {/* ── Collar (ankle opening) ──────────────────────── */}
-            <path
-              d="M48 13 Q58 11 61 18 L61 31 L59 31 L59 24 Q56 16 48 13 Z"
-              fill="#222229"
-            />
-            {/* Collar padded edge */}
-            <path
-              d="M48 13 Q58 10 61 18"
-              fill="none"
-              stroke="#2E2E38"
+              d="M 11 14 Q 18.5 11.5, 25.5 13"
+              stroke="#FF5A1F"
               strokeWidth="2"
               strokeLinecap="round"
             />
-
-            {/* ── Heel tab — orange ───────────────────────────── */}
-            <rect x="57" y="12" width="4" height="12" rx="2" fill="#FF5A1F" />
-            {/* Heel tab notch */}
-            <rect x="58.5" y="13.5" width="1" height="3" rx="0.5" fill="#CC4010" />
-
-            {/* ── Lace cage / eyelets ─────────────────────────── */}
-            <path
-              d="M18 20 L34 17.5"
-              stroke="#2B2B35"
-              strokeWidth="3"
-              strokeLinecap="round"
-            />
-            {/* Laces — lime/hazard */}
-            <line x1="18" y1="20" x2="34" y2="17.5" stroke="#D4FF3D" strokeWidth="1" strokeLinecap="round" strokeDasharray="2 2" />
-            <line x1="18" y1="23" x2="36" y2="20.5" stroke="#D4FF3D" strokeWidth="1" strokeLinecap="round" strokeDasharray="2 2" />
-            <line x1="18" y1="26" x2="38" y2="23.5" stroke="#D4FF3D" strokeWidth="1" strokeLinecap="round" strokeDasharray="2 2" />
-            {/* Lace eyelet dots */}
-            <circle cx="18" cy="20" r="1.2" fill="#333340" />
-            <circle cx="18" cy="23" r="1.2" fill="#333340" />
-            <circle cx="18" cy="26" r="1.2" fill="#333340" />
-
-            {/* ── Swoosh-style brand accent stripe ────────────── */}
-            <path
-              d="M13 29 Q28 20 46 15.5"
-              fill="none"
+            {/* Sole stripe */}
+            <line
+              x1="5.5"
+              y1="19.5"
+              x2="25.5"
+              y2="19.5"
               stroke="#FF5A1F"
-              strokeWidth="2.2"
+              strokeWidth="1.2"
               strokeLinecap="round"
-              opacity="0.8"
             />
-
-            {/* ── Perforations on toe box (Air Force 1 style) ── */}
-            <circle cx="9" cy="24" r="0.7" fill="#2B2B33" />
-            <circle cx="9" cy="27" r="0.7" fill="#2B2B33" />
-            <circle cx="11" cy="22" r="0.7" fill="#2B2B33" />
+            {/* Lacing dots */}
+            <circle cx="14.5" cy="9.5" r="0.8" fill="#D4FF3D" />
+            <circle cx="17" cy="11" r="0.8" fill="#D4FF3D" />
           </svg>
           IQFITS-<span className="text-hazard">47</span>
         </Link>
