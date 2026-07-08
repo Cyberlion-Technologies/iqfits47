@@ -52,6 +52,18 @@ export function Navbar() {
     loadAnnouncements();
   }, []);
 
+  // Lock body scroll when mobile menu is open
+  useEffect(() => {
+    if (menuOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [menuOpen]);
+
   return (
     <header className="sticky top-0 z-40 border-b border-ink/10 bg-stone-50/90 backdrop-blur">
       {/* running ticker */}
@@ -121,7 +133,7 @@ export function Navbar() {
           <Menu size={22} />
         </button>
 
-        <Link href="/" className="flex flex-col items-center justify-center gap-1 group text-center">
+        <Link href="/" className="absolute left-1/2 -translate-x-1/2 flex flex-col items-center justify-center gap-1 group text-center lg:relative lg:left-0 lg:translate-x-0">
           <div className="flex items-center gap-2">
             {/* Double hazard orange diagonal slashes prefix */}
             <div className="flex gap-1 -skew-x-12 shrink-0">
@@ -206,7 +218,11 @@ export function Navbar() {
             >
               <div className="flex items-center justify-between">
                 <span className="font-display text-xl">MENU</span>
-                <button onClick={() => setMenuOpen(false)} aria-label="Close menu">
+                <button
+                  onClick={() => setMenuOpen(false)}
+                  className="rounded-full p-2 hover:bg-ink/5"
+                  aria-label="Close menu"
+                >
                   <X size={22} />
                 </button>
               </div>

@@ -73,18 +73,30 @@ export function ShopFilters() {
   );
 
   return (
-    <div className="mb-8 flex flex-wrap items-center justify-between gap-3">
+    <div className="mb-8 grid grid-cols-2 gap-3 sm:flex sm:flex-wrap sm:items-center sm:justify-between">
       <div className="hidden flex-wrap gap-2 sm:flex">{pills}</div>
 
       <button
-        className="flex items-center gap-2 rounded-full border border-ink/15 px-4 py-2 font-mono text-xs uppercase tracking-wide sm:hidden"
+        className="flex items-center justify-center gap-2 rounded-full border border-ink/15 px-4 py-2 font-mono text-xs uppercase tracking-wide sm:hidden"
         onClick={() => setMobileOpen(true)}
       >
         <SlidersHorizontal size={14} /> Filter
       </button>
 
-      <div className="flex w-full items-center gap-2 sm:w-auto">
-        <form onSubmit={handleSearchSubmit} className="relative flex flex-1 items-center max-w-[200px] sm:max-w-xs">
+      <select
+        value={activeSort}
+        onChange={(e) => updateParam("sort", e.target.value)}
+        className="rounded-full border border-ink/15 bg-transparent px-4 py-2 font-mono text-xs uppercase tracking-wide w-full sm:hidden"
+      >
+        {sortOptions.map((o) => (
+          <option key={o.value} value={o.value}>
+            {o.label}
+          </option>
+        ))}
+      </select>
+
+      <div className="col-span-2 sm:col-span-1 flex w-full items-center gap-2 sm:w-auto">
+        <form onSubmit={handleSearchSubmit} className="relative flex flex-1 items-center max-w-none sm:max-w-xs">
           <input
             type="text"
             placeholder="Search catalog..."
@@ -113,7 +125,7 @@ export function ShopFilters() {
         <select
           value={activeSort}
           onChange={(e) => updateParam("sort", e.target.value)}
-          className="rounded-full border border-ink/15 bg-transparent px-4 py-1.5 font-mono text-xs uppercase tracking-wide shrink-0"
+          className="hidden sm:block rounded-full border border-ink/15 bg-transparent px-4 py-1.5 font-mono text-xs uppercase tracking-wide shrink-0"
         >
           {sortOptions.map((o) => (
             <option key={o.value} value={o.value}>

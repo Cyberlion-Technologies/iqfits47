@@ -297,15 +297,19 @@ export default function ReferralPage() {
                         </h2>
                         <p className="mt-0.5 font-mono text-xs text-ink/40">{affiliate.phone}</p>
                       </div>
-                      <div className="grid grid-cols-3 gap-4 sm:text-right">
+                      <div className="grid grid-cols-3 gap-2 sm:gap-4 sm:text-right">
                         {[
                           { label: "Referrals", value: affiliate.referral_count },
                           { label: "Total Earned", value: `KES ${affiliate.total_credit_kes.toLocaleString()}` },
                           { label: "Pending", value: `KES ${affiliate.pending_credit_kes.toLocaleString()}` },
                         ].map((s) => (
-                          <div key={s.label}>
-                            <div className="font-display text-2xl tracking-tight">{s.value}</div>
-                            <div className="font-mono text-[10px] uppercase tracking-widest text-ink/40">{s.label}</div>
+                          <div key={s.label} className="min-w-0">
+                            <div className="font-display text-base sm:text-2xl tracking-tight truncate sm:whitespace-normal" title={String(s.value)}>
+                              {s.value}
+                            </div>
+                            <div className="font-mono text-[9px] sm:text-[10px] uppercase tracking-widest text-ink/45 truncate">
+                              {s.label}
+                            </div>
                           </div>
                         ))}
                       </div>
@@ -341,22 +345,24 @@ export default function ReferralPage() {
                   {/* Referral Link */}
                   <div className="rounded-3xl border border-ink/10 bg-white p-6 shadow-sm">
                     <h3 className="mb-3 font-display text-lg uppercase tracking-tight">Your referral link</h3>
-                    <div className="flex gap-2">
+                    <div className="flex flex-col gap-2 sm:flex-row">
                       <div className="flex-1 overflow-hidden rounded-xl border border-ink/15 bg-stone-50 px-4 py-3">
                         <p className="truncate font-mono text-xs text-ink/60">{referralLink}</p>
                       </div>
-                      <button
-                        onClick={handleCopy}
-                        className="flex items-center gap-1.5 rounded-xl border border-ink/15 px-4 py-3 font-mono text-xs uppercase tracking-wide transition-colors hover:bg-ink hover:text-stone-50"
-                      >
-                        {copied ? <><Check size={14} /> Copied!</> : <><Copy size={14} /> Copy</>}
-                      </button>
-                      <button
-                        onClick={handleShare}
-                        className="flex items-center gap-1.5 rounded-xl bg-hazard px-4 py-3 font-mono text-xs uppercase tracking-wide text-white transition-colors hover:bg-hazard/90"
-                      >
-                        <Share2 size={14} /> Share
-                      </button>
+                      <div className="flex gap-2 shrink-0">
+                        <button
+                          onClick={handleCopy}
+                          className="flex-1 sm:flex-none flex items-center justify-center gap-1.5 rounded-xl border border-ink/15 px-4 py-3 font-mono text-xs uppercase tracking-wide transition-colors hover:bg-ink hover:text-stone-50"
+                        >
+                          {copied ? <><Check size={14} /> Copied!</> : <><Copy size={14} /> Copy</>}
+                        </button>
+                        <button
+                          onClick={handleShare}
+                          className="flex-1 sm:flex-none flex items-center justify-center gap-1.5 rounded-xl bg-hazard px-4 py-3 font-mono text-xs uppercase tracking-wide text-white transition-colors hover:bg-hazard/90"
+                        >
+                          <Share2 size={14} /> Share
+                        </button>
+                      </div>
                     </div>
                     <p className="mt-3 text-xs text-ink/40">
                       Share this link on WhatsApp, Instagram, or anywhere — when your friend orders using this link, you both benefit.

@@ -57,7 +57,7 @@ export function NotificationModal({
             initial={{ opacity: 0, scale: 0.95, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 20 }}
-            className="fixed inset-x-4 top-[15%] z-50 mx-auto max-w-md rounded-2xl bg-stone-50 p-6 shadow-2xl md:top-[20%]"
+            className="fixed inset-x-4 top-[15%] z-50 mx-auto max-w-md rounded-2xl bg-stone-50 p-6 shadow-2xl md:top-[20%] max-h-[80vh] overflow-y-auto"
           >
             <div className="flex items-center justify-between border-b border-ink/5 pb-4">
               <div className="flex items-center gap-2">
