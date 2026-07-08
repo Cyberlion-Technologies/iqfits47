@@ -100,24 +100,49 @@ function OnboardingContent() {
     }
   ]);
 
-  // Load state from localStorage on mount
+  // Load state from localStorage on mount and dynamically listen for updates from other tabs
   useEffect(() => {
-    const savedMpesa = localStorage.getItem("onboarding_mpesa_phone");
-    if (savedMpesa) {
-      setMpesaPhone(savedMpesa);
-      setMpesaLinked(true);
-      setSteps(prev => prev.map(s => s.id === 3 ? { ...s, isCompleted: true } : s));
-    }
+    const loadChecklistState = () => {
+      const savedMpesa = localStorage.getItem("onboarding_mpesa_phone");
+      const savedReferral = localStorage.getItem("onboarding_referral_registered");
+      const savedDownloaded = localStorage.getItem("onboarding_brand_downloaded");
+      const savedWhatsApp = localStorage.getItem("onboarding_whatsapp_joined");
 
-    const savedDownloaded = localStorage.getItem("onboarding_brand_downloaded");
-    if (savedDownloaded) {
-      setSteps(prev => prev.map(s => s.id === 4 ? { ...s, isCompleted: true } : s));
-    }
+      if (savedMpesa) {
+        setMpesaPhone(savedMpesa);
+        setMpesaLinked(true);
+      }
 
-    const savedWhatsApp = localStorage.getItem("onboarding_whatsapp_joined");
-    if (savedWhatsApp) {
-      setSteps(prev => prev.map(s => s.id === 5 ? { ...s, isCompleted: true } : s));
-    }
+      setSteps(prev =>
+        prev.map(s => {
+          if (s.id === 2 && savedReferral === "true") {
+            return { ...s, isCompleted: true };
+          }
+          if (s.id === 3 && savedMpesa) {
+            return { ...s, isCompleted: true };
+          }
+          if (s.id === 4 && savedDownloaded) {
+            return { ...s, isCompleted: true };
+          }
+          if (s.id === 5 && savedWhatsApp) {
+            return { ...s, isCompleted: true };
+          }
+          return s;
+        })
+      );
+    };
+
+    loadChecklistState();
+
+    // Listen to storage changes (fired from the other tab on the same origin)
+    window.addEventListener("storage", loadChecklistState);
+    // Listen to focus changes (fired when the user switches tabs back to this page)
+    window.addEventListener("focus", loadChecklistState);
+
+    return () => {
+      window.removeEventListener("storage", loadChecklistState);
+      window.removeEventListener("focus", loadChecklistState);
+    };
   }, []);
 
   const handleStepAction = (step: Step) => {
@@ -126,6 +151,10 @@ function OnboardingContent() {
         localStorage.setItem("onboarding_whatsapp_joined", "true");
         setSteps(prev => prev.map(s => s.id === 5 ? { ...s, isCompleted: true } : s));
         toast.success("Redirecting to WhatsApp Community...");
+        window.open(step.targetUrl, "_blank", "noopener,noreferrer");
+      } else if (step.id === 2) {
+        // Open referral registration in a new tab
+        toast.info("Opening Referral Registration in a new tab...");
         window.open(step.targetUrl, "_blank", "noopener,noreferrer");
       } else {
         router.push(step.targetUrl);

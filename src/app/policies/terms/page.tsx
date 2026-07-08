@@ -1,9 +1,12 @@
-﻿import React from "react";
+import React from "react";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "Terms of Service",
   description: "Read the Terms of Service and sales conditions for shopping on IQFITS-47.",
+  alternates: {
+    canonical: "/policies/terms",
+  },
 };
 
 export default function TermsOfServicePage() {

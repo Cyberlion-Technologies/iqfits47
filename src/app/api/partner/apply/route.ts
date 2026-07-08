@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabaseServer, isSupabaseServerConfigured } from "@/lib/supabase/server";
-import { sendPartnerConfirmationEmail } from "@/lib/mail";
+import { sendPartnerConfirmationEmail, sendAdminPartnerApplicationEmail } from "@/lib/mail";
 
 export async function POST(req: NextRequest) {
   try {
@@ -75,6 +75,19 @@ export async function POST(req: NextRequest) {
           return false;
         });
     }
+
+    // 2b. Trigger notification email to admin using Resend
+    sendAdminPartnerApplicationEmail({
+      name,
+      email,
+      phone,
+      company,
+      website,
+      partnershipType,
+      message,
+    }).catch((err) => {
+      console.error("Failed to send admin partner application email:", err);
+    });
 
     // 3. Trigger confirmation SMS to partner has been disabled per request.
     // Partner will only receive SMS once approved by the admin in the dashboard.

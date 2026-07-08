@@ -1,9 +1,12 @@
-﻿import React from "react";
+import React from "react";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "Cookie Policy",
   description: "Learn how IQFITS-47 uses cookies and local storage to enhance your shopping experience.",
+  alternates: {
+    canonical: "/policies/cookies",
+  },
 };
 
 export default function CookiePolicyPage() {

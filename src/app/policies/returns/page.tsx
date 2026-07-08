@@ -1,9 +1,12 @@
-﻿import React from "react";
+import React from "react";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "Returns & Exchanges",
   description: "Learn about the return, refund, and exchange policies for sneakers, apparel, and accessories at IQFITS-47.",
+  alternates: {
+    canonical: "/policies/returns",
+  },
 };
 
 export default function ReturnsPolicyPage() {

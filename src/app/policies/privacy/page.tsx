@@ -4,6 +4,9 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "Privacy Policy",
   description: "Learn how IQFITS-47 handles your personal data, order information, and payment security.",
+  alternates: {
+    canonical: "/policies/privacy",
+  },
 };
 
 export default function PrivacyPolicyPage() {

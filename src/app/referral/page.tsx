@@ -95,6 +95,15 @@ export default function ReferralPage() {
         setPhase("idle");
         return;
       }
+      // Store in localStorage to auto-complete onboarding checklist
+      localStorage.setItem("onboarding_referral_registered", "true");
+      // Pre-fill / link the M-Pesa phone number for payouts as well
+      let cleaned = phone.replace(/\D/g, "");
+      if (cleaned.startsWith("0")) {
+        cleaned = "254" + cleaned.slice(1);
+      }
+      localStorage.setItem("onboarding_mpesa_phone", cleaned);
+
       setAffiliate(data.affiliate);
       setPhase("dashboard");
     } catch {

@@ -20,7 +20,8 @@ function StarIcon({ className, size = 14 }: { className?: string; size?: number 
     </svg>
   );
 }
-import { getProductBySlug, getRelatedProducts, getDbProducts } from "@/lib/data/products";
+import { getProductBySlug, getRelatedProducts, getDbProducts, categories } from "@/lib/data/products";
+import Link from "next/link";
 import nextDynamic from "next/dynamic";
 
 const ProductGallery = nextDynamic(() => import("@/components/product/product-gallery").then((m) => m.ProductGallery));
@@ -284,6 +285,24 @@ export default async function ProductPage({
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }}
       />
+
+      {/* Breadcrumbs */}
+      <nav className="mb-6 flex items-center space-x-2 font-mono text-[10px] sm:text-xs uppercase tracking-wider text-ink/40 overflow-x-auto whitespace-nowrap scrollbar-none">
+        <Link href="/" className="hover:text-ink transition-colors">
+          Home
+        </Link>
+        <span className="text-ink/15">/</span>
+        <Link href="/shop" className="hover:text-ink transition-colors">
+          Shop
+        </Link>
+        <span className="text-ink/15">/</span>
+        <Link href={`/shop?category=${product.category}`} className="hover:text-ink transition-colors">
+          {categories.find((c) => c.id === product.category)?.label || product.category}
+        </Link>
+        <span className="text-ink/15">/</span>
+        <span className="text-ink/80 truncate max-w-[180px] sm:max-w-none">{product.name}</span>
+      </nav>
+
       <div className="grid gap-10 lg:grid-cols-2 lg:gap-16">
         <ProductGallery images={product.images} name={product.name} />
 

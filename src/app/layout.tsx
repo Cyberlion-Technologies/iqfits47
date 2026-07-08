@@ -5,6 +5,7 @@ import { Footer } from "@/components/layout/footer";
 import { ClientWrapper } from "@/components/layout/client-wrapper";
 import { StructuredData } from "@/components/layout/structured-data";
 import { Analytics } from "@vercel/analytics/react";
+import Script from "next/script";
 
 const display = Anton({
   subsets: ["latin"],
@@ -194,10 +195,6 @@ export const metadata: Metadata = {
   publisher: "IQFITS-47",
   category: "Shopping",
 
-  alternates: {
-    canonical: SITE_URL,
-  },
-
   robots: {
     index: true,
     follow: true,
@@ -285,6 +282,21 @@ export default function RootLayout({
         <StructuredData />
       </head>
       <body className="bg-stone-50 font-body text-ink antialiased">
+        {/* Google tag (gtag.js) */}
+        <Script
+          async
+          src="https://www.googletagmanager.com/gtag/js?id=G-3LZ5VCPWHX"
+          strategy="afterInteractive"
+        />
+        <Script id="google-analytics" strategy="afterInteractive">
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+
+            gtag('config', 'G-3LZ5VCPWHX');
+          `}
+        </Script>
         <ClientWrapper>
           {children}
         </ClientWrapper>

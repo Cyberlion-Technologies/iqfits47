@@ -336,6 +336,44 @@ export async function sendAdminReferralNotificationEmail(
 }
 
 /**
+ * Notifies the store admin about a new affiliate/referral registration.
+ */
+export async function sendAdminNewAffiliateNotificationEmail(
+  phone: string,
+  displayName: string,
+  referralCode: string
+): Promise<boolean> {
+  const html = `
+    ${getEmailHeader(`New Referral Sign-up`, `New Affiliate`)}
+      <p style="margin-top: 0; font-size: 16px;">Hey Admin,</p>
+      <p>A new user has registered for the referral program!</p>
+      
+      <h3 style="border-bottom: 2px solid #15151A; padding-bottom: 8px; margin-top: 30px; font-size: 14px; text-transform: uppercase; letter-spacing: 0.05em; color: #15151A;">AFFILIATE DETAILS</h3>
+      <table style="width: 100%; border-collapse: collapse; font-size: 14px; line-height: 1.6;">
+        <tr>
+          <td style="padding: 6px 0; font-weight: bold; color: #7c7c8c; width: 140px;">Phone</td>
+          <td style="padding: 6px 0; color: #15151A;">${phone}</td>
+        </tr>
+        <tr>
+          <td style="padding: 6px 0; font-weight: bold; color: #7c7c8c;">Display Name</td>
+          <td style="padding: 6px 0; color: #15151A;">${displayName || "Not provided"}</td>
+        </tr>
+        <tr>
+          <td style="padding: 6px 0; font-weight: bold; color: #7c7c8c;">Referral Code</td>
+          <td style="padding: 6px 0; color: #15151A; font-weight: bold; text-transform: uppercase;">${referralCode}</td>
+        </tr>
+      </table>
+    ${getEmailFooter()}
+  `;
+
+  return sendEmail({
+    to: ADMIN_EMAIL,
+    subject: `[NEW REFERRAL SIGN-UP] Code: ${referralCode} - ${displayName || phone} [IQFITS-47]`,
+    html,
+  });
+}
+
+/**
  * Notifies the store admin about a new partner application.
  */
 export async function sendAdminPartnerApplicationEmail(app: {

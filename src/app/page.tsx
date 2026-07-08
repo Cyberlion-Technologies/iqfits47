@@ -1,6 +1,13 @@
+import type { Metadata } from "next";
 import nextDynamic from "next/dynamic";
 export const dynamic = "force-dynamic";
 import { CategoryShelf } from "@/components/home/category-shelf";
+
+export const metadata: Metadata = {
+  alternates: {
+    canonical: "/",
+  },
+};
 import { TrustStrip } from "@/components/home/trust-strip";
 import { InstagramCta } from "@/components/home/instagram-cta";
 

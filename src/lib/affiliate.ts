@@ -1,5 +1,5 @@
 import { supabaseServer } from "@/lib/supabase/server";
-import { sendAdminReferralNotificationEmail } from "@/lib/mail";
+import { sendAdminReferralNotificationEmail, sendAdminNewAffiliateNotificationEmail } from "@/lib/mail";
 
 // ── Tier definitions ────────────────────────────────────────────────────────
 export const TIERS = [
@@ -100,6 +100,14 @@ export async function getOrCreateAffiliate(
     .single();
 
   if (error || !created) throw new Error("Failed to create affiliate: " + error?.message);
+
+  // Send admin notification using Resend
+  sendAdminNewAffiliateNotificationEmail(
+    created.phone,
+    created.display_name,
+    created.referral_code
+  ).catch((err) => console.error("Failed to send admin notification for new affiliate registration:", err));
+
   return created as AffiliateRecord;
 }
 

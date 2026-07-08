@@ -4,6 +4,9 @@ export const metadata: Metadata = {
   title: "Refer & Earn — IQFITS-47",
   description:
     "Refer friends to IQFITS-47 and earn KES 200–500 per successful referral. Your friend gets 5% off their first order. Climb the ranks from Bronze to Legend.",
+  alternates: {
+    canonical: "/referral",
+  },
   openGraph: {
     title: "Refer & Earn — IQFITS-47",
     description:
