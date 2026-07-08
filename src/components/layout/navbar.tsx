@@ -217,10 +217,10 @@ export function Navbar() {
               transition={{ type: "spring", stiffness: 300, damping: 32 }}
             >
               <div className="flex items-center justify-between">
-                <span className="font-display text-xl">MENU</span>
+                <span className="font-display text-xl text-ink">MENU</span>
                 <button
                   onClick={() => setMenuOpen(false)}
-                  className="rounded-full p-2 hover:bg-ink/5"
+                  className="rounded-full p-2 hover:bg-ink/5 text-ink"
                   aria-label="Close menu"
                 >
                   <X size={22} />
@@ -233,7 +233,7 @@ export function Navbar() {
                     href={l.href}
                     onClick={() => setMenuOpen(false)}
                     className={cn(
-                      "border-b border-ink/10 py-4 font-display text-2xl uppercase tracking-tight"
+                      "border-b border-ink/10 py-4 font-display text-2xl uppercase tracking-tight text-ink hover:text-hazard transition-colors"
                     )}
                   >
                     <span className="mr-3 font-mono text-xs text-ink/40">0{i + 1}</span>
@@ -243,14 +243,14 @@ export function Navbar() {
                 <Link
                   href="/wishlist"
                   onClick={() => setMenuOpen(false)}
-                  className="mt-6 flex items-center gap-2 font-mono text-sm uppercase tracking-wide text-ink/60"
+                  className="mt-6 flex items-center gap-2 font-mono text-sm uppercase tracking-wide text-ink/70 hover:text-hazard transition-colors"
                 >
                   <Heart size={16} /> Wishlist
                 </Link>
                 <Link
                   href="/track-order"
                   onClick={() => setMenuOpen(false)}
-                  className="mt-3 flex items-center gap-2 font-mono text-sm uppercase tracking-wide text-ink/60"
+                  className="mt-3 flex items-center gap-2 font-mono text-sm uppercase tracking-wide text-ink/70 hover:text-hazard transition-colors"
                 >
                   <Package size={16} /> Track an order
                 </Link>
