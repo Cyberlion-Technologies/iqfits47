@@ -20,7 +20,10 @@ export async function GET(req: NextRequest) {
 
   // If already paid/processing/dispatched/etc, don't check Lipia Online API
   if (order.status !== "payment_pending") {
-    return NextResponse.json({ status: order.status });
+    if (order.status === "cancelled") {
+      return NextResponse.json({ status: "cancelled", order });
+    }
+    return NextResponse.json({ status: "success", order });
   }
 
   if (!order.transactionReference) {
@@ -52,7 +55,8 @@ export async function GET(req: NextRequest) {
           }
         }
         return NextResponse.json({
-          status: markPaidResult.order.status,
+          status: "success",
+          order: markPaidResult.order,
           message: result.message,
           receipt: markPaidResult.order.mpesaReceipt,
         });
@@ -72,7 +76,8 @@ export async function GET(req: NextRequest) {
           console.error("Failed to send cancellation SMS in status check:", smsErr);
         }
         return NextResponse.json({
-          status: updated.status,
+          status: "cancelled",
+          order: updated,
           message: result.message,
           receipt: result.mpesaReceipt,
         });

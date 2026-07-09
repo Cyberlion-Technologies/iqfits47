@@ -195,7 +195,7 @@ export default function CheckoutPage() {
     pollRef.current = setInterval(async () => {
       attempts++;
       try {
-        const res = await fetch(`/api/payments/status?order=${orderNumber}`);
+        const res = await fetch(`/api/payments/status?orderNumber=${orderNumber}`);
         const data = await res.json();
 
         if (data.status === "success") {
