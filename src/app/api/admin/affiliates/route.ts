@@ -1,12 +1,9 @@
 import { NextResponse, NextRequest } from "next/server";
 import { supabaseServer, isSupabaseServerConfigured } from "@/lib/supabase/server";
-
-function isAdmin(req: NextRequest) {
-  return req.cookies.get("iqfit_admin_session")?.value === "true";
-}
+import { checkAdminAuth } from "@/lib/auth";
 
 export async function GET(req: NextRequest) {
-  if (!isAdmin(req)) {
+  if (!checkAdminAuth(req)) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
   if (!isSupabaseServerConfigured()) {

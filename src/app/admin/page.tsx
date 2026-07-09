@@ -37,8 +37,9 @@ import {
 import { formatKES } from "@/lib/utils";
 import { Product, Order, OrderStatus } from "@/lib/types";
 import { toast } from "sonner";
+import ReportsTab from "@/components/admin/ReportsTab";
 
-type Tab = "orders" | "products" | "offers" | "announcements" | "referrals" | "partners";
+type Tab = "orders" | "products" | "offers" | "announcements" | "referrals" | "partners" | "reports";
 
 interface AffiliateAdmin {
   id: string;
@@ -582,6 +583,17 @@ export default function AdminDashboardPage() {
       p.colorway.toLowerCase().includes(productQuery.toLowerCase())
   );
 
+  const filteredPartners = partners.filter((p) => {
+    const matchQuery =
+      p.name.toLowerCase().includes(partnerQuery.toLowerCase()) ||
+      p.email.toLowerCase().includes(partnerQuery.toLowerCase()) ||
+      (p.company && p.company.toLowerCase().includes(partnerQuery.toLowerCase())) ||
+      (p.website && p.website.toLowerCase().includes(partnerQuery.toLowerCase()));
+    const matchStatus = partnerStatusFilter === "all" || p.status === partnerStatusFilter;
+    const matchType = partnerTypeFilter === "all" || p.partnership_type === partnerTypeFilter;
+    return matchQuery && matchStatus && matchType;
+  });
+
   return (
     <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
       {/* Header */}
@@ -707,6 +719,14 @@ export default function AdminDashboardPage() {
               {partners.filter((p) => p.status === "pending").length}
             </span>
           )}
+        </button>
+        <button
+          onClick={() => setActiveTab("reports")}
+          className={`border-b-2 px-6 py-3 font-semibold transition-colors flex items-center gap-2 ${
+            activeTab === "reports" ? "border-hazard text-hazard" : "border-transparent text-ink/40 hover:text-ink"
+          }`}
+        >
+          <Activity size={14} /> Reports
         </button>
       </div>
 
@@ -1350,50 +1370,34 @@ export default function AdminDashboardPage() {
               </div>
             </div>
 
-            {/* Partners Table */}
+            {/* Applications Table */}
             <div className="overflow-x-auto rounded-2xl border border-ink/10 bg-white">
               <table className="w-full border-collapse text-left text-sm">
                 <thead>
-                  <tr className="border-b border-ink/10 bg-stone-50 font-mono text-[10px] uppercase text-ink/50">
-                    <th className="px-4 py-3">Applicant Info</th>
-                    <th className="px-4 py-3">Partnership Type</th>
-                    <th className="px-4 py-3">Proposal / Message</th>
-                    <th className="px-4 py-3">Status</th>
-                    <th className="px-4 py-3">Submitted At</th>
-                    <th className="px-4 py-3 text-right">Actions</th>
+                  <tr className="border-b border-ink/10 bg-stone-50 font-mono text-xs uppercase text-ink/50">
+                    <th className="px-4 py-4">Applicant</th>
+                    <th className="px-4 py-4">Type</th>
+                    <th className="px-4 py-4">Proposal</th>
+                    <th className="px-4 py-4">Status</th>
+                    <th className="px-4 py-4">Date</th>
+                    <th className="px-4 py-4 text-right">Actions</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-ink/5">
-                  {partners.filter(p => {
-                    const matchQuery = p.name.toLowerCase().includes(partnerQuery.toLowerCase()) ||
-                      p.email.toLowerCase().includes(partnerQuery.toLowerCase()) ||
-                      (p.company && p.company.toLowerCase().includes(partnerQuery.toLowerCase())) ||
-                      (p.website && p.website.toLowerCase().includes(partnerQuery.toLowerCase()));
-                    const matchStatus = partnerStatusFilter === "all" || p.status === partnerStatusFilter;
-                    const matchType = partnerTypeFilter === "all" || p.partnership_type === partnerTypeFilter;
-                    return matchQuery && matchStatus && matchType;
-                  }).length === 0 ? (
+                  {filteredPartners.length === 0 ? (
                     <tr>
-                      <td colSpan={6} className="px-4 py-8 text-center text-ink/40 font-mono text-xs">
-                        No partner applications found.
+                      <td colSpan={6} className="px-4 py-12 text-center text-ink/40 font-mono">
+                        No applications found.
                       </td>
                     </tr>
                   ) : (
-                    partners.filter(p => {
-                      const matchQuery = p.name.toLowerCase().includes(partnerQuery.toLowerCase()) ||
-                        p.email.toLowerCase().includes(partnerQuery.toLowerCase()) ||
-                        (p.company && p.company.toLowerCase().includes(partnerQuery.toLowerCase())) ||
-                        (p.website && p.website.toLowerCase().includes(partnerQuery.toLowerCase()));
-                      const matchStatus = partnerStatusFilter === "all" || p.status === partnerStatusFilter;
-                      const matchType = partnerTypeFilter === "all" || p.partnership_type === partnerTypeFilter;
-                      return matchQuery && matchStatus && matchType;
-                    }).map((part) => (
-                      <tr key={part.id} className="hover:bg-stone-50/50 text-xs">
-                        <td className="px-4 py-3 max-w-[200px]">
+                    filteredPartners.map((part) => (
+                      <tr key={part.id} className="hover:bg-stone-50/50">
+                        <td className="px-4 py-3">
                           <div className="font-semibold text-ink">{part.name}</div>
-                          <div className="text-[10px] text-ink/40 font-mono break-all">{part.email}</div>
+                          <div className="text-[10px] text-ink/50">{part.email}</div>
                           <div className="text-[10px] text-ink/40 font-mono">{part.phone}</div>
-                          {part.company && <div className="mt-1 text-[10px] font-medium text-ink/60">Co: {part.company}</div>}
+                          {part.company && <div className="text-[10px] text-ink/60 font-semibold mt-0.5">{part.company}</div>}
                           {part.website && (
                             <a
                               href={part.website.startsWith("http") ? part.website : `https://${part.website}`}
@@ -1459,6 +1463,10 @@ export default function AdminDashboardPage() {
               </table>
             </div>
           </div>
+        )}
+
+        {activeTab === "reports" && (
+          <ReportsTab orders={orders} products={products} affiliates={affiliates} />
         )}
       </div>
 

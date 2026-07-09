@@ -1,8 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabaseServer, isSupabaseServerConfigured } from "@/lib/supabase/server";
 import { products } from "@/lib/data/products";
+import { checkAdminAuth } from "@/lib/auth";
 
 export async function POST(req: NextRequest) {
+  if (!checkAdminAuth(req)) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
   try {
     if (!isSupabaseServerConfigured()) {
       return NextResponse.json(

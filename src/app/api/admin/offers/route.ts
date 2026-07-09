@@ -1,10 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabaseServer, isSupabaseServerConfigured } from "@/lib/supabase/server";
-
-function checkAuth(req: NextRequest): boolean {
-  const cookie = req.cookies.get("iqfit_admin_session");
-  return cookie?.value === "true";
-}
+import { checkAdminAuth } from "@/lib/auth";
 
 export async function GET(req: NextRequest) {
   if (!isSupabaseServerConfigured()) {
@@ -24,7 +20,7 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
-  if (!checkAuth(req)) {
+  if (!checkAdminAuth(req)) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
   if (!isSupabaseServerConfigured()) {
@@ -63,7 +59,7 @@ export async function POST(req: NextRequest) {
 }
 
 export async function PUT(req: NextRequest) {
-  if (!checkAuth(req)) {
+  if (!checkAdminAuth(req)) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
   if (!isSupabaseServerConfigured()) {
@@ -103,7 +99,7 @@ export async function PUT(req: NextRequest) {
 }
 
 export async function DELETE(req: NextRequest) {
-  if (!checkAuth(req)) {
+  if (!checkAdminAuth(req)) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
   if (!isSupabaseServerConfigured()) {

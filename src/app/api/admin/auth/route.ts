@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { createSessionToken, checkAdminAuth } from "@/lib/auth";
 
 export async function POST(req: NextRequest) {
   try {
@@ -8,8 +9,10 @@ export async function POST(req: NextRequest) {
     if (passcode === adminPasscode) {
       const response = NextResponse.json({ success: true, message: "Authentication successful." });
       
-      // Set admin session cookie (expires in 7 days)
-      response.cookies.set("iqfit_admin_session", "true", {
+      const token = createSessionToken();
+      
+      // Set secure signed admin session cookie (expires in 7 days)
+      response.cookies.set("iqfit_admin_session", token, {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
         sameSite: "lax",
@@ -27,8 +30,7 @@ export async function POST(req: NextRequest) {
 }
 
 export async function GET(req: NextRequest) {
-  const cookie = req.cookies.get("iqfit_admin_session");
-  const isAuthenticated = cookie?.value === "true";
+  const isAuthenticated = checkAdminAuth(req);
   return NextResponse.json({ isAuthenticated });
 }
 
