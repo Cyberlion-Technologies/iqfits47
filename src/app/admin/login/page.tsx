@@ -4,12 +4,17 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { ShieldAlert, Loader2, ArrowRight } from "lucide-react";
+import { Turnstile } from "@/components/admin/Turnstile";
 
 export default function AdminLoginPage() {
   const router = useRouter();
   const [passcode, setPasscode] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [turnstileToken, setTurnstileToken] = useState("");
+  const [resetKey, setResetKey] = useState(0);
+
+  const siteKey = process.env.NEXT_PUBLIC_CLOUDFLARE_TURNSTILE_SITE_KEY;
 
   async function handleLogin(e: React.FormEvent) {
     e.preventDefault();
@@ -20,17 +25,25 @@ export default function AdminLoginPage() {
       const res = await fetch("/api/admin/auth", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ passcode }),
+        body: JSON.stringify({ passcode, turnstileToken }),
       });
       const data = await res.json();
 
       if (!res.ok) {
         setError(data.error ?? "Invalid passcode");
+        if (siteKey) {
+          setTurnstileToken("");
+          setResetKey((prev) => prev + 1);
+        }
       } else {
         router.push("/admin");
       }
     } catch {
       setError("Couldn't reach the server.");
+      if (siteKey) {
+        setTurnstileToken("");
+        setResetKey((prev) => prev + 1);
+      }
     } finally {
       setLoading(false);
     }
@@ -71,6 +84,16 @@ export default function AdminLoginPage() {
             />
           </div>
 
+          {siteKey && (
+            <Turnstile
+              key={resetKey}
+              siteKey={siteKey}
+              onSuccess={(token) => setTurnstileToken(token)}
+              onError={() => setTurnstileToken("")}
+              onExpire={() => setTurnstileToken("")}
+            />
+          )}
+
           {error && (
             <p className="rounded-xl bg-hazard-100 px-4 py-3 text-center text-sm font-medium text-hazard">
               {error}
@@ -79,7 +102,7 @@ export default function AdminLoginPage() {
 
           <button
             type="submit"
-            disabled={loading}
+            disabled={loading || (!!siteKey && !turnstileToken)}
             className="flex w-full items-center justify-center gap-2 rounded-full bg-ink py-4 font-display text-sm uppercase tracking-wide text-stone-50 hover:bg-ink/90 transition-transform active:scale-[1.01] disabled:opacity-60"
           >
             {loading ? (

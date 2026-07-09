@@ -3,7 +3,27 @@ import { createSessionToken, checkAdminAuth } from "@/lib/auth";
 
 export async function POST(req: NextRequest) {
   try {
-    const { passcode } = await req.json();
+    const { passcode, turnstileToken } = await req.json();
+    
+    // Verify Turnstile token if configured
+    const turnstileSecret = process.env.CLOUDFLARE_TURNSTILE_SECRET_KEY;
+    if (turnstileSecret) {
+      if (!turnstileToken) {
+        return NextResponse.json({ error: "Security check token missing. Please solve the captcha." }, { status: 400 });
+      }
+
+      const verifyRes = await fetch("https://challenges.cloudflare.com/turnstile/v0/siteverify", {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: `secret=${encodeURIComponent(turnstileSecret)}&response=${encodeURIComponent(turnstileToken)}`,
+      });
+
+      const verifyData = await verifyRes.json();
+      if (!verifyData.success) {
+        return NextResponse.json({ error: "Security check failed. Please try again." }, { status: 400 });
+      }
+    }
+
     const adminPasscode = process.env.ADMIN_PASSCODE ?? "IQFITS-47-ADMIN-2026";
 
     if (passcode === adminPasscode) {
