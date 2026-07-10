@@ -68,7 +68,7 @@ export function PWAInstall() {
     <>
       <div className="flex flex-col gap-2.5">
         <span className="font-mono text-xs text-stone-50/50 uppercase tracking-widest">Download our App</span>
-        <div className="flex flex-col gap-2 sm:flex-row md:flex-col lg:flex-row">
+        <div className="flex flex-wrap gap-2">
           {/* iOS / App Store Button */}
           <button
             onClick={handleiOSInstall}
