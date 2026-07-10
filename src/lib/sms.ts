@@ -155,7 +155,7 @@ export async function sendPartnerStatusUpdateSMS(
   const formattedType = partnershipType.replace(/_/g, " ");
   let statusText = "";
   if (status === "accepted") {
-    statusText = `has been APPROVED! 🎉 Welcome to the circle. Start onboarding here: iqfits47.store/partner/onboarding?name=${encodeURIComponent(name)}&type=${encodeURIComponent(partnershipType)}`;
+    statusText = `has been APPROVED! 🎉 Welcome to the circle. Start onboarding here: https://iqfits47.store/partner/onboarding?name=${encodeURIComponent(name)}&type=${encodeURIComponent(partnershipType)}`;
   } else if (status === "rejected") {
     statusText = "update: At this time, we are unable to move forward with an active partnership. We will keep your proposal on file for future campaigns. Thank you!";
   } else if (status === "reviewed") {

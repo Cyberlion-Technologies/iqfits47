@@ -473,37 +473,52 @@ export async function sendPartnerStatusUpdateEmail(
   app: { name: string; email: string; partnershipType: string },
   status: "accepted" | "rejected" | "reviewed"
 ): Promise<boolean> {
-  const isAccepted = status === "accepted";
-  const subtitleText = isAccepted ? "Application Approved" : "Application Update";
-  const subjectText = isAccepted
-    ? `Partnership Application Approved! 🎉 [IQFITS-47]`
-    : `Partnership Application Update — [IQFITS-47]`;
+  let subtitleText = "Application Update";
+  let subjectText = `Partnership Application Update — [IQFITS-47]`;
+  let statusHtml = "";
+
+  if (status === "accepted") {
+    subtitleText = "Application Approved";
+    subjectText = `Partnership Application Approved! 🎉 [IQFITS-47]`;
+    statusHtml = `
+      <div style="background-color: #f0fdf4; border-radius: 12px; padding: 20px; margin: 24px 0; border: 1px solid #bbf7d0; font-size: 14px; line-height: 1.6; color: #15803d;">
+        <p style="margin-top: 0; font-size: 16px; font-weight: bold; text-transform: uppercase; letter-spacing: 0.05em; color: #166534;">Congratulations! Your application has been ACCEPTED.</p>
+        <p style="margin-bottom: 16px; color: #166534;">We are thrilled to welcome you to the IQFITS-47 circle. A member of our team will contact you in the next 24-48 hours to discuss next steps, share exclusive codes, and set up our onboarding call.</p>
+        <p style="margin-bottom: 0; text-align: center;">
+          <a href="https://iqfits47.store/partner/onboarding?name=${encodeURIComponent(app.name)}&type=${encodeURIComponent(app.partnershipType)}" style="background-color: #FF5A1F; color: #ffffff; padding: 12px 24px; text-decoration: none; border-radius: 30px; font-weight: bold; display: inline-block; font-size: 14px; border: 1px solid #FF5A1F;">
+            Start Onboarding Setup
+          </a>
+        </p>
+      </div>
+    `;
+  } else if (status === "reviewed") {
+    subtitleText = "Application Under Review";
+    subjectText = `Partnership Application Under Review ⏳ [IQFITS-47]`;
+    statusHtml = `
+      <div style="background-color: #fffbeb; border-radius: 12px; padding: 20px; margin: 24px 0; border: 1px solid #fef3c7; font-size: 14px; line-height: 1.6; color: #92400e;">
+        <p style="margin-top: 0; font-size: 16px; font-weight: bold; text-transform: uppercase; letter-spacing: 0.05em; color: #d97706;">Application Under Review ⏳</p>
+        <p style="margin-bottom: 12px; color: #78350f;">Great news! We have started reviewing your application. Our creative team is currently evaluating your profile, social handles, and proposal to see how they align with our upcoming drops and brand vibe.</p>
+        <p style="margin-bottom: 0; color: #78350f;">No further action is required from you at this moment. We will update you as soon as the review is complete (usually within 3-5 business days). Thank you for your patience!</p>
+      </div>
+    `;
+  } else {
+    // rejected
+    subtitleText = "Application Update";
+    subjectText = `Partnership Application Update — [IQFITS-47]`;
+    statusHtml = `
+      <div style="background-color: #fafaf9; border-radius: 12px; padding: 20px; margin: 24px 0; border: 1px solid #e7e5e4; font-size: 14px; line-height: 1.6; color: #57534e;">
+        <p style="margin-top: 0; font-weight: bold; color: #1c1917; text-transform: uppercase; font-size: 12px; letter-spacing: 0.05em; color: #44403c;">Update on your application:</p>
+        <p style="margin-bottom: 0;">At this time, we are unable to move forward with an active partnership. However, we were highly impressed by your profile and will keep your contact details and proposal on file as new drops and campaigns roll out in the future.</p>
+      </div>
+    `;
+  }
 
   const html = `
     ${getEmailHeader(`Partnership Update`, subtitleText)}
       <p style="margin-top: 0;">Hi <strong>${app.name}</strong>,</p>
       <p>We are writing to update you on your partnership application with <strong>IQFITS-47</strong> as a <strong style="text-transform: uppercase; color: #FF5A1F;">${app.partnershipType.replace(/_/g, " ")}</strong>.</p>
       
-      ${
-        isAccepted
-          ? `
-        <div style="background-color: #f0fdf4; border-radius: 12px; padding: 20px; margin: 24px 0; border: 1px solid #bbf7d0; font-size: 14px; line-height: 1.6; color: #15803d;">
-          <p style="margin-top: 0; font-size: 16px; font-weight: bold; text-transform: uppercase; letter-spacing: 0.05em;">Congratulations! Your application has been ACCEPTED.</p>
-          <p style="margin-bottom: 16px; color: #166534;">We are thrilled to welcome you to the IQFITS-47 circle. A member of our team will contact you in the next 24-48 hours to discuss next steps, share exclusive codes, and set up our onboarding call.</p>
-          <p style="margin-bottom: 0; text-align: center;">
-            <a href="https://iqfits47.store/partner/onboarding?name=${encodeURIComponent(app.name)}&type=${encodeURIComponent(app.partnershipType)}" style="background-color: #FF5A1F; color: #ffffff; padding: 12px 24px; text-decoration: none; border-radius: 30px; font-weight: bold; display: inline-block; font-size: 14px; border: 1px solid #FF5A1F;">
-              Start Onboarding Setup
-            </a>
-          </p>
-        </div>
-      `
-          : `
-        <div style="background-color: #fafaf9; border-radius: 12px; padding: 20px; margin: 24px 0; border: 1px solid #e7e5e4; font-size: 14px; line-height: 1.6; color: #57534e;">
-          <p style="margin-top: 0; font-weight: bold; color: #1c1917; text-transform: uppercase; font-size: 12px; letter-spacing: 0.05em;">Update on your application:</p>
-          <p style="margin-bottom: 0;">At this time, we are unable to move forward with a active partnership. However, we were highly impressed by your profile and will keep your contact details and proposal on file as new drops and campaigns roll out in the future.</p>
-        </div>
-      `
-      }
+      ${statusHtml}
 
       <p>Thank you again for connecting with us. We appreciate your passion and support for our brand!</p>
     ${getEmailFooter()}

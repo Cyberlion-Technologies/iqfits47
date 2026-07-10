@@ -4,6 +4,7 @@ import Link from "next/link";
 import { MapPin, Package, Gift, Mail } from "lucide-react";
 import { InstagramIcon } from "@/components/ui/instagram-icon";
 import { DeveloperCTA } from "./developer-cta";
+import { PWAInstall } from "./pwa-install";
 
 export function Footer() {
   return (
@@ -103,6 +104,9 @@ export function Footer() {
                 >
                   Join WhatsApp Community
                 </a>
+              </li>
+              <li className="pt-3">
+                <PWAInstall />
               </li>
               <li className="pt-1 font-mono text-xs text-stone-50/50">
                 Payments secured via M-Pesa STK Push

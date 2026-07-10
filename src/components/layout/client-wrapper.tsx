@@ -10,6 +10,15 @@ const ToasterClient = dynamic(() => import("@/components/layout/toaster-client")
 const CompareDrawer = dynamic(() => import("@/components/product/compare-drawer").then((m) => m.CompareDrawer), { ssr: false });
 
 export function ClientWrapper({ children }: { children: React.ReactNode }) {
+  React.useEffect(() => {
+    if (typeof window !== "undefined" && "serviceWorker" in navigator) {
+      navigator.serviceWorker
+        .register("/sw.js")
+        .then((reg) => console.log("PWA Service Worker registered:", reg.scope))
+        .catch((err) => console.error("PWA Service Worker registration failed:", err));
+    }
+  }, []);
+
   return (
     <>
       {/* Capture ?ref= query param into localStorage on any page */}

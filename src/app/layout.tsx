@@ -218,8 +218,8 @@ export const metadata: Metadata = {
     images: [
       {
         url: OG_IMAGE,
-        width: 1200,
-        height: 630,
+        width: 1024,
+        height: 1024,
         alt: "IQFITS-47 — Kicks, Streetwear & Designer Fits in Kenya",
         type: "image/png",
       },
