@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { CheckCircle2, Loader2, AlertCircle } from "lucide-react";
+import { CheckCircle2, Loader2, AlertCircle, Smartphone, ShieldCheck } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 // ── Types ────────────────────────────────────────────────────────────────────
@@ -18,6 +18,7 @@ interface FormState {
   preferred_date: string;
   preferred_time: string;
   notes: string;
+  pay_deposit: boolean;
 }
 
 const TATTOO_STYLES = [
@@ -51,11 +52,9 @@ const MIN_DATE = (() => {
   return d.toISOString().split("T")[0];
 })();
 
-// ── Shared input classes ─────────────────────────────────────────────────────
 const fieldBase =
   "w-full rounded-xl border border-stone-50/10 bg-stone-50/5 px-4 py-3 text-sm text-stone-50 placeholder-stone-50/30 outline-none transition-all duration-150 focus:border-hazard focus:bg-stone-50/8";
 
-// ── Sub-components ───────────────────────────────────────────────────────────
 function Label({ children, required }: { children: React.ReactNode; required?: boolean }) {
   return (
     <label className="mb-1.5 block font-mono text-[11px] uppercase tracking-widest text-stone-50/50">
@@ -75,7 +74,6 @@ function FieldError({ msg }: { msg?: string }) {
   );
 }
 
-// ── Main Form ────────────────────────────────────────────────────────────────
 export function StudioBookingForm() {
   const [form, setForm] = useState<FormState>({
     full_name: "",
@@ -89,11 +87,13 @@ export function StudioBookingForm() {
     preferred_date: "",
     preferred_time: "",
     notes: "",
+    pay_deposit: true,
   });
 
   const [errors, setErrors] = useState<Partial<Record<keyof FormState, string>>>({});
-  const [status, setStatus] = useState<"idle" | "submitting" | "success" | "error">("idle");
+  const [status, setStatus] = useState<"idle" | "submitting" | "stk_sent" | "success" | "error">("idle");
   const [bookingRef, setBookingRef] = useState<string | null>(null);
+  const [stkMessage, setStkMessage] = useState<string | null>(null);
   const [apiError, setApiError] = useState<string | null>(null);
 
   const set = (field: keyof FormState) => (
@@ -107,8 +107,8 @@ export function StudioBookingForm() {
     const e: typeof errors = {};
     if (!form.full_name.trim()) e.full_name = "Required";
     if (!form.phone.trim()) e.phone = "Required";
-    if (!/^0[0-9]{9}$/.test(form.phone.trim().replace(/\s/g, "")))
-      e.phone = "Enter a valid Kenyan number (e.g. 0712345678)";
+    if (!/^(?:254|0|\+254)?[71]\d{8}$/.test(form.phone.trim().replace(/\s/g, "")))
+      e.phone = "Enter a valid Safaricom number (e.g. 0712345678)";
     if (!form.tattoo_style) e.tattoo_style = "Pick a style";
     if (!form.tattoo_size) e.tattoo_size = "Pick a size";
     if (!form.body_placement.trim()) e.body_placement = "Required";
@@ -128,7 +128,7 @@ export function StudioBookingForm() {
       const res = await fetch("/api/bookings", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...form, booking_type: "studio" }),
+        body: JSON.stringify({ ...form, booking_type: "studio", deposit_amount: 1000 }),
       });
 
       const data = await res.json();
@@ -140,37 +140,52 @@ export function StudioBookingForm() {
       }
 
       setBookingRef(data.booking?.booking_ref ?? null);
-      setStatus("success");
+      if (data.payment?.success) {
+        setStkMessage(data.payment.message || "STK Push prompt sent to your Safaricom phone!");
+        setStatus("stk_sent");
+      } else {
+        setStatus("success");
+      }
     } catch {
       setApiError("Network error. Please check your connection and try again.");
       setStatus("error");
     }
   }
 
-  // ── Success state ────────────────────────────────────────────────────────
-  if (status === "success") {
+  // ── Success / STK state ──────────────────────────────────────────────────
+  if (status === "stk_sent" || status === "success") {
     return (
       <motion.div
         initial={{ opacity: 0, scale: 0.96 }}
         animate={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-        className="flex flex-col items-center justify-center gap-6 rounded-2xl border border-hazard/30 bg-hazard/5 px-6 py-20 text-center"
+        transition={{ duration: 0.4 }}
+        className="flex flex-col items-center justify-center gap-6 rounded-2xl border border-hazard/30 bg-hazard/5 px-6 py-16 text-center"
       >
         <div className="flex h-16 w-16 items-center justify-center rounded-full bg-hazard/20">
-          <CheckCircle2 size={32} className="text-hazard" />
+          {status === "stk_sent" ? (
+            <Smartphone size={32} className="text-hazard animate-bounce" />
+          ) : (
+            <CheckCircle2 size={32} className="text-hazard" />
+          )}
         </div>
         <div>
           <h3 className="font-display text-3xl uppercase tracking-tight">
-            Booking Received!
+            {status === "stk_sent" ? "M-Pesa STK Push Sent!" : "Booking Received!"}
           </h3>
           {bookingRef && (
             <p className="mt-2 font-mono text-sm text-stone-50/50">
-              Ref: <span className="text-hazard">{bookingRef}</span>
+              Ref: <span className="text-hazard font-bold">{bookingRef}</span>
             </p>
           )}
+          {stkMessage && (
+            <div className="mt-4 rounded-xl border border-hazard/30 bg-hazard/10 p-4 font-mono text-xs text-hazard">
+              {stkMessage}
+            </div>
+          )}
           <p className="mt-4 max-w-sm text-sm text-stone-50/60">
-            We'll review your request and hit you on WhatsApp within 24 hours to
-            confirm your slot and discuss deposit details.
+            {status === "stk_sent"
+              ? "Please check your phone and enter your M-Pesa PIN to complete your KES 1,000 booking deposit. Our studio lead will confirm your time slot on IG/WhatsApp."
+              : "We'll review your request and hit you on WhatsApp within 24 hours to confirm your slot and details."}
           </p>
         </div>
         <a
@@ -179,16 +194,15 @@ export function StudioBookingForm() {
           rel="noopener noreferrer"
           className="font-mono text-xs uppercase tracking-widest text-hazard underline-offset-4 hover:underline"
         >
-          Follow @47.studio._ for updates →
+          Follow @47.studio._ on Instagram →
         </a>
       </motion.div>
     );
   }
 
-  // ── Form ─────────────────────────────────────────────────────────────────
   return (
     <form onSubmit={handleSubmit} noValidate>
-      <div className="grid gap-10 lg:grid-cols-2">
+      <div className="grid gap-8 lg:grid-cols-2">
         {/* Left col — personal + tattoo details */}
         <div className="space-y-6">
           <div className="rounded-2xl border border-stone-50/10 bg-stone-50/[0.03] p-6 sm:p-8">
@@ -199,7 +213,6 @@ export function StudioBookingForm() {
               <div>
                 <Label required>Full Name</Label>
                 <input
-                  id="studio-full-name"
                   type="text"
                   placeholder="e.g. Amara Ngugi"
                   value={form.full_name}
@@ -209,9 +222,8 @@ export function StudioBookingForm() {
                 <FieldError msg={errors.full_name} />
               </div>
               <div>
-                <Label required>Phone Number</Label>
+                <Label required>Safaricom Phone (M-Pesa)</Label>
                 <input
-                  id="studio-phone"
                   type="tel"
                   placeholder="0712 345 678"
                   value={form.phone}
@@ -223,7 +235,6 @@ export function StudioBookingForm() {
               <div>
                 <Label>Email (optional)</Label>
                 <input
-                  id="studio-email"
                   type="email"
                   placeholder="you@email.com"
                   value={form.email}
@@ -243,7 +254,6 @@ export function StudioBookingForm() {
               <div>
                 <Label required>Date</Label>
                 <input
-                  id="studio-date"
                   type="date"
                   min={MIN_DATE}
                   value={form.preferred_date}
@@ -255,14 +265,10 @@ export function StudioBookingForm() {
                   )}
                 />
                 <FieldError msg={errors.preferred_date} />
-                <p className="mt-1.5 font-mono text-[10px] text-stone-50/30">
-                  Minimum 3 days' notice required.
-                </p>
               </div>
               <div>
                 <Label>Preferred Time Slot</Label>
                 <select
-                  id="studio-time"
                   value={form.preferred_time}
                   onChange={set("preferred_time")}
                   className={cn(fieldBase, "cursor-pointer")}
@@ -275,6 +281,32 @@ export function StudioBookingForm() {
                   ))}
                 </select>
               </div>
+            </div>
+          </div>
+
+          {/* M-Pesa Booking Fee Deposit Option */}
+          <div className="rounded-2xl border border-hazard/30 bg-hazard/5 p-6 sm:p-8">
+            <div className="flex items-center justify-between">
+              <h3 className="font-display text-lg uppercase tracking-wide flex items-center gap-2">
+                <ShieldCheck size={18} className="text-hazard" />
+                Booking Deposit (M-Pesa)
+              </h3>
+              <span className="font-mono text-sm font-bold text-hazard">KES 1,000</span>
+            </div>
+            <p className="mt-2 text-xs text-stone-50/60 leading-relaxed font-body">
+              Lock in your date &amp; time slot immediately via Safaricom M-Pesa STK Push. The deposit is fully credited toward your tattoo session cost.
+            </p>
+            <div className="mt-4 flex items-center gap-3">
+              <input
+                type="checkbox"
+                id="pay_deposit_toggle"
+                checked={form.pay_deposit}
+                onChange={(e) => setForm((f) => ({ ...f, pay_deposit: e.target.checked }))}
+                className="h-4 w-4 rounded accent-hazard cursor-pointer"
+              />
+              <label htmlFor="pay_deposit_toggle" className="font-mono text-xs text-stone-50/80 cursor-pointer">
+                Send M-Pesa STK Push for KES 1,000 booking deposit now
+              </label>
             </div>
           </div>
         </div>
@@ -294,13 +326,12 @@ export function StudioBookingForm() {
                     <button
                       key={s.value}
                       type="button"
-                      id={`style-${s.value}`}
                       onClick={() => {
                         setForm((f) => ({ ...f, tattoo_style: s.value }));
                         setErrors((er) => ({ ...er, tattoo_style: undefined }));
                       }}
                       className={cn(
-                        "rounded-lg border px-3 py-1.5 font-mono text-xs uppercase tracking-wide transition-all",
+                        "rounded-lg border px-3.5 py-2 font-mono text-xs uppercase tracking-wide transition-all min-h-[44px]",
                         form.tattoo_style === s.value
                           ? "border-hazard bg-hazard/20 text-hazard"
                           : "border-stone-50/15 text-stone-50/50 hover:border-stone-50/30 hover:text-stone-50/80"
@@ -321,13 +352,12 @@ export function StudioBookingForm() {
                     <button
                       key={s.value}
                       type="button"
-                      id={`size-${s.value}`}
                       onClick={() => {
                         setForm((f) => ({ ...f, tattoo_size: s.value }));
                         setErrors((er) => ({ ...er, tattoo_size: undefined }));
                       }}
                       className={cn(
-                        "rounded-lg border px-3 py-1.5 font-mono text-xs uppercase tracking-wide transition-all",
+                        "rounded-lg border px-3.5 py-2 font-mono text-xs uppercase tracking-wide transition-all min-h-[44px]",
                         form.tattoo_size === s.value
                           ? "border-hazard bg-hazard/20 text-hazard"
                           : "border-stone-50/15 text-stone-50/50 hover:border-stone-50/30 hover:text-stone-50/80"
@@ -343,7 +373,6 @@ export function StudioBookingForm() {
               <div>
                 <Label required>Body Placement</Label>
                 <input
-                  id="studio-placement"
                   type="text"
                   placeholder="e.g. Inner forearm, right side"
                   value={form.body_placement}
@@ -356,61 +385,20 @@ export function StudioBookingForm() {
               <div>
                 <Label required>Design Idea / Description</Label>
                 <textarea
-                  id="studio-description"
                   rows={4}
                   placeholder="Describe your tattoo idea — motifs, symbols, mood, references..."
                   value={form.design_description}
                   onChange={set("design_description")}
-                  className={cn(
-                    fieldBase,
-                    "resize-none",
-                    errors.design_description && "border-hazard/60"
-                  )}
+                  className={cn(fieldBase, "resize-none", errors.design_description && "border-hazard/60")}
                 />
                 <FieldError msg={errors.design_description} />
               </div>
 
-              {/* Reference art toggle */}
-              <div className="flex items-center gap-3">
-                <button
-                  type="button"
-                  id="studio-reference-toggle"
-                  role="checkbox"
-                  aria-checked={form.has_reference_art}
-                  onClick={() =>
-                    setForm((f) => ({ ...f, has_reference_art: !f.has_reference_art }))
-                  }
-                  className={cn(
-                    "relative h-5 w-9 rounded-full border transition-all",
-                    form.has_reference_art
-                      ? "border-hazard bg-hazard"
-                      : "border-stone-50/20 bg-stone-50/10"
-                  )}
-                >
-                  <span
-                    className={cn(
-                      "absolute top-0.5 h-4 w-4 rounded-full bg-white shadow transition-all",
-                      form.has_reference_art ? "left-4" : "left-0.5"
-                    )}
-                  />
-                </button>
-                <span className="font-mono text-xs text-stone-50/50 uppercase tracking-wide">
-                  I have reference images to share
-                </span>
-              </div>
-              {form.has_reference_art && (
-                <p className="font-mono text-[11px] text-stone-50/40">
-                  After booking confirmation, send your references to us via WhatsApp — we'll
-                  share the number when we confirm.
-                </p>
-              )}
-
               <div>
                 <Label>Additional Notes</Label>
                 <textarea
-                  id="studio-notes"
-                  rows={3}
-                  placeholder="Allergies, scheduling constraints, questions..."
+                  rows={2}
+                  placeholder="Allergies, scheduling constraints..."
                   value={form.notes}
                   onChange={set("notes")}
                   className={cn(fieldBase, "resize-none")}
@@ -419,7 +407,6 @@ export function StudioBookingForm() {
             </div>
           </div>
 
-          {/* Submit */}
           <AnimatePresence>
             {status === "error" && apiError && (
               <motion.div
@@ -436,19 +423,12 @@ export function StudioBookingForm() {
 
           <button
             type="submit"
-            id="studio-submit-btn"
             disabled={status === "submitting"}
-            className="group flex w-full items-center justify-center gap-3 rounded-xl bg-hazard py-4 font-display text-sm uppercase tracking-wide text-white transition-all hover:scale-[1.01] hover:bg-hazard/90 disabled:cursor-not-allowed disabled:opacity-60"
+            className="flex w-full items-center justify-center gap-3 rounded-xl bg-hazard py-4 min-h-[50px] font-display text-sm uppercase tracking-wide text-white transition-all hover:scale-[1.01] active:scale-95 disabled:cursor-not-allowed disabled:opacity-60 shadow-lg shadow-hazard/20"
           >
-            {status === "submitting" ? (
-              <Loader2 size={18} className="animate-spin" />
-            ) : null}
-            {status === "submitting" ? "Sending booking..." : "Request Studio Session"}
+            {status === "submitting" ? <Loader2 size={18} className="animate-spin" /> : null}
+            {status === "submitting" ? "Processing..." : form.pay_deposit ? "Pay Deposit (KES 1,000) & Book Session" : "Request Studio Session"}
           </button>
-
-          <p className="text-center font-mono text-[10px] uppercase tracking-widest text-stone-50/30">
-            We'll confirm within 24 hrs via WhatsApp
-          </p>
         </div>
       </div>
     </form>

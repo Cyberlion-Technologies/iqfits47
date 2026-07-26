@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabaseServer, isSupabaseServerConfigured } from "@/lib/supabase/server";
+import { initiateStkPush } from "@/lib/lipia";
+import { normalizeMpesaPhone } from "@/lib/utils";
 import { sendBookingConfirmationEmail, sendAdminNewBookingEmail } from "@/lib/mail";
 import { sendBookingConfirmationSMS, sendAdminNewBookingSMS } from "@/lib/sms";
 
@@ -27,6 +29,8 @@ export async function POST(req: NextRequest) {
       preferred_date,
       preferred_time,
       tour_date_id,
+      pay_deposit,
+      deposit_amount,
     } = body;
 
     // ── Validate required fields ──────────────────────────────────────────────
@@ -35,6 +39,10 @@ export async function POST(req: NextRequest) {
     }
     if (!phone?.trim()) {
       return NextResponse.json({ error: "Phone number is required." }, { status: 400 });
+    }
+    const normalizedPhone = normalizeMpesaPhone(phone);
+    if (!normalizedPhone) {
+      return NextResponse.json({ error: "Enter a valid Safaricom phone number, e.g. 0712345678." }, { status: 400 });
     }
     if (!tattoo_style) {
       return NextResponse.json({ error: "Tattoo style is required." }, { status: 400 });
@@ -56,10 +64,11 @@ export async function POST(req: NextRequest) {
     }
 
     // ── Check tour date capacity ───────────────────────────────────────────────
+    let tourCityDepositPrice = 1500;
     if (booking_type === "tour" && tour_date_id) {
       const { data: tourDate, error: tourErr } = await supabaseServer
         .from("tour_dates")
-        .select("id, total_slots, booked_slots, status")
+        .select("id, total_slots, booked_slots, status, deposit_price_kes")
         .eq("id", tour_date_id)
         .single();
 
@@ -78,7 +87,12 @@ export async function POST(req: NextRequest) {
           { status: 400 }
         );
       }
+      if (tourDate.deposit_price_kes) {
+        tourCityDepositPrice = tourDate.deposit_price_kes;
+      }
     }
+
+    const calculatedDeposit = booking_type === "tour" ? tourCityDepositPrice : (deposit_amount || 1000);
 
     // ── Insert booking ────────────────────────────────────────────────────────
     const { data: booking, error: insertErr } = await supabaseServer
@@ -86,7 +100,7 @@ export async function POST(req: NextRequest) {
       .insert({
         booking_type: booking_type || "studio",
         full_name: full_name.trim(),
-        phone: phone.trim(),
+        phone: normalizedPhone,
         email: email?.trim() || null,
         tattoo_style,
         tattoo_size,
@@ -98,6 +112,8 @@ export async function POST(req: NextRequest) {
         preferred_time: booking_type === "studio" ? (preferred_time || null) : null,
         tour_date_id: booking_type === "tour" ? tour_date_id : null,
         status: "pending",
+        deposit_amount: calculatedDeposit,
+        deposit_paid: false,
       })
       .select("id, booking_ref, status, created_at")
       .single();
@@ -110,11 +126,34 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // ── Trigger M-Pesa STK Push for Booking Deposit Fee (if requested) ───────
+    let stkResult = null;
+    if (pay_deposit) {
+      try {
+        stkResult = await initiateStkPush({
+          phone: normalizedPhone,
+          amount: calculatedDeposit,
+          accountReference: booking.booking_ref,
+          transactionDesc: `47Studio Tattoo Deposit ${booking.booking_ref}`,
+        });
+
+        // Store transaction reference on booking if available
+        if (stkResult?.reference) {
+          await supabaseServer
+            .from("studio_bookings")
+            .update({ mpesa_receipt: stkResult.reference })
+            .eq("id", booking.id);
+        }
+      } catch (stkErr) {
+        console.error("Booking deposit STK push error:", stkErr);
+      }
+    }
+
     // ── Trigger Email & SMS Notifications ─────────────────────────────────────
     const payload = {
       booking_ref: booking.booking_ref,
       full_name: full_name.trim(),
-      phone: phone.trim(),
+      phone: normalizedPhone,
       email: email?.trim() || null,
       booking_type: booking_type || "studio",
       tattoo_style,
@@ -124,7 +163,6 @@ export async function POST(req: NextRequest) {
       preferred_date: booking_type === "studio" ? preferred_date : null,
     };
 
-    // Send notifications concurrently without blocking the HTTP response
     Promise.allSettled([
       sendBookingConfirmationEmail(payload),
       sendAdminNewBookingEmail(payload),
@@ -132,7 +170,11 @@ export async function POST(req: NextRequest) {
       sendAdminNewBookingSMS(payload),
     ]).catch((err) => console.error("Notification dispatch error:", err));
 
-    return NextResponse.json({ booking }, { status: 201 });
+    return NextResponse.json({
+      booking,
+      payment: stkResult,
+      depositAmount: calculatedDeposit,
+    }, { status: 201 });
   } catch (err) {
     console.error("Booking API error:", err);
     return NextResponse.json(
