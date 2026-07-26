@@ -4,7 +4,7 @@ const SITE_URL = "https://iqfits47.store";
 const STUDIO_OG_IMAGE = `${SITE_URL}/studio-logo.jpg`;
 
 export const metadata: Metadata = {
-  title: "47Studio Console — Operations & Booking Management",
+  title: "47Studio Console | Operations & Booking Management",
   description: "Manage 47Studio tattoo bookings, Kenya tour dates, slot capacities & pricing policies.",
   icons: {
     icon: "/studio-logo.jpg",

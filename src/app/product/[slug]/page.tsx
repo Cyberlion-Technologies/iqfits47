@@ -46,7 +46,7 @@ export async function generateMetadata({
   const product = await getProductBySlug(slug);
   if (!product) return {};
 
-  const title = `${product.name} — ${product.brand} | Buy Online Kenya | IQFITS-47`;
+  const title = `${product.name} | ${product.brand} | Buy Online Kenya | IQFITS-47`;
 
   // Rich, keyword-dense description for Google Search snippets
   const availableSizes = product.sizes

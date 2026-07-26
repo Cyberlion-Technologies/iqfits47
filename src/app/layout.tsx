@@ -37,7 +37,7 @@ export const metadata: Metadata = {
   applicationName: "IQFITS-47",
 
   title: {
-    default: "IQFITS-47 — Original Kicks, Sneakers & Designer Fits in Kenya",
+    default: "IQFITS-47 | Original Kicks, Sneakers & Designer Fits in Kenya",
     template: "%s | IQFITS-47",
   },
 
@@ -208,9 +208,9 @@ export const metadata: Metadata = {
   },
 
   openGraph: {
-    title: "IQFITS-47 — Original Kicks, Sneakers & Designer Fits in Kenya",
+    title: "IQFITS-47 | Original Kicks, Sneakers & Designer Fits in Kenya",
     description:
-      "Authentic sneakers and designer fits, delivered across Kenya. Shop Nike, Adidas, New Balance, Jordan & more. Pay with M-Pesa — fast delivery in Nairobi.",
+      "Authentic sneakers and designer fits, delivered across Kenya. Shop Nike, Adidas, New Balance, Jordan & more. Pay with M-Pesa | fast delivery in Nairobi.",
     url: SITE_URL,
     siteName: "IQFITS-47",
     locale: "en_KE",
@@ -220,7 +220,7 @@ export const metadata: Metadata = {
         url: OG_IMAGE,
         width: 1024,
         height: 1024,
-        alt: "IQFITS-47 — Kicks, Streetwear & Designer Fits in Kenya",
+        alt: "IQFITS-47 | Kicks, Streetwear & Designer Fits in Kenya",
         type: "image/png",
       },
     ],
@@ -228,7 +228,7 @@ export const metadata: Metadata = {
 
   twitter: {
     card: "summary_large_image",
-    title: "IQFITS-47 — Original Kicks & Designer Fits in Kenya",
+    title: "IQFITS-47 | Original Kicks & Designer Fits in Kenya",
     description:
       "Kenya's home for authentic kicks, streetwear and designer clothing. Pay with M-Pesa. Fast delivery.",
     images: [OG_IMAGE],
