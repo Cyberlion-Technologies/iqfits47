@@ -2,19 +2,23 @@ import { Order } from "@/lib/types";
 import { formatKES } from "@/lib/utils";
 
 const RESEND_API_KEY = process.env.RESEND_API_KEY || "";
-const MAIL_SENDER = "IQFITS-47 <notifications@iqfits47.store>";
-const ADMIN_EMAIL = "iqfits47@gmail.com"; // Notify admin here
+const MAIL_SENDER = process.env.RESEND_FROM_EMAIL || "IQFITS-47 <notifications@iqfits47.store>";
+const STUDIO_SENDER = process.env.STUDIO_FROM_EMAIL || "47Studio <bookings@iqfits47.store>";
+const ADMIN_EMAIL = process.env.ADMIN_NOTIFY_EMAIL || "iqfits47@gmail.com";
+const STUDIO_ADMIN_EMAIL = process.env.STUDIO_ADMIN_EMAIL || ADMIN_EMAIL;
 
 interface SendEmailParams {
   to: string;
   subject: string;
   html: string;
+  from?: string;
 }
 
-async function sendEmail({ to, subject, html }: SendEmailParams): Promise<boolean> {
+export async function sendEmail({ to, subject, html, from }: SendEmailParams): Promise<boolean> {
   if (!RESEND_API_KEY) {
     console.log("==================================================");
     console.log(`[EMAIL SIMULATOR] Sending email to: ${to}`);
+    console.log(`[EMAIL SIMULATOR] From: ${from || MAIL_SENDER}`);
     console.log(`[EMAIL SIMULATOR] Subject: ${subject}`);
     console.log(`[EMAIL SIMULATOR] Body:\n`, html.replace(/<[^>]*>/g, " ").trim().slice(0, 300) + "...");
     console.log("==================================================");
@@ -29,7 +33,7 @@ async function sendEmail({ to, subject, html }: SendEmailParams): Promise<boolea
         Authorization: `Bearer ${RESEND_API_KEY}`,
       },
       body: JSON.stringify({
-        from: MAIL_SENDER,
+        from: from || MAIL_SENDER,
         to: [to],
         subject,
         html,
@@ -52,9 +56,7 @@ async function sendEmail({ to, subject, html }: SendEmailParams): Promise<boolea
 function getEmailHeader(title: string, subtitle: string): string {
   return `
     <div style="font-family: -apple-system, BlinkMacSystemFont, 'Space Grotesk', 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; color: #15151A; background-color: #F4F2ED;">
-      <!-- Header Block -->
       <div style="background-color: #15151A; padding: 32px 24px; text-align: center; border-radius: 20px 20px 0 0; border-bottom: 3px solid #FF5A1F;">
-        <!-- Real logo from header/footer -->
         <table align="center" border="0" cellpadding="0" cellspacing="0" style="margin: 0 auto 4px auto; border-collapse: collapse;">
           <tr>
             <td style="padding: 0; vertical-align: middle;">
@@ -68,50 +70,43 @@ function getEmailHeader(title: string, subtitle: string): string {
             </td>
             <td style="width: 8px; padding: 0;"></td>
             <td style="padding: 0; vertical-align: middle;">
-              <h1 style="font-size: 32px; margin: 0; letter-spacing: -0.05em; text-transform: uppercase; color: #F4F2ED; line-height: 1; font-weight: 900; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">
+              <h1 style="font-size: 32px; margin: 0; letter-spacing: -0.05em; text-transform: uppercase; color: #F4F2ED; line-height: 1; font-weight: 900;">
                 IQFITS-<span style="color: #FF5A1F;">47</span>
               </h1>
             </td>
           </tr>
         </table>
-        <p style="font-size: 8px; color: #DFDBCF; margin: 6px 0 0 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; letter-spacing: 0.18em; font-weight: bold; text-transform: uppercase; text-align: center;">
+        <p style="font-size: 8px; color: #DFDBCF; margin: 6px 0 0 0; letter-spacing: 0.18em; font-weight: bold; text-transform: uppercase; text-align: center;">
           KICKS &bull; STREETWEAR &bull; DESIGNER FITS
         </p>
         <div style="display: inline-block; margin-top: 16px; background-color: #FF5A1F; color: #ffffff; padding: 6px 16px; font-family: monospace; font-size: 11px; letter-spacing: 0.1em; border-radius: 9999px; text-transform: uppercase; font-weight: bold;">
           ${subtitle}
         </div>
       </div>
-      <!-- Main Content Container -->
-      <div style="background-color: #ffffff; border-radius: 0 0 20px 20px; padding: 32px 24px; border: 1px solid #DFDBCF; border-top: none; box-shadow: 0 4px 12px rgba(21, 21, 26, 0.03); font-size: 15px; line-height: 1.6; color: #15151A;">
+      <div style="background-color: #ffffff; border-radius: 0 0 20px 20px; padding: 32px 24px; border: 1px solid #DFDBCF; border-top: none; font-size: 15px; line-height: 1.6; color: #15151A;">
   `;
 }
 
 function getEmailFooter(): string {
   return `
       </div>
-      <!-- Branded Footer -->
-      <div style="text-align: center; margin-top: 32px; padding: 0 16px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">
-        <!-- Social Links Section -->
+      <div style="text-align: center; margin-top: 32px; padding: 0 16px;">
         <div style="margin-bottom: 24px;">
           <p style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.12em; color: #7c7c8c; margin-bottom: 12px; font-weight: bold;">Connect With Us</p>
-          <a href="https://www.instagram.com/47.iqfits._/" target="_blank" style="display: inline-block; background-color: #15151A; color: #F4F2ED; padding: 10px 20px; text-decoration: none; border-radius: 30px; font-weight: bold; font-size: 12px; margin: 0 6px; border: 1px solid rgba(255, 90, 31, 0.2); letter-spacing: 0.02em;">
+          <a href="https://www.instagram.com/47.iqfits._/" target="_blank" style="display: inline-block; background-color: #15151A; color: #F4F2ED; padding: 10px 20px; text-decoration: none; border-radius: 30px; font-weight: bold; font-size: 12px; margin: 0 6px;">
             Instagram
           </a>
-          <a href="https://chat.whatsapp.com/HKekz4fQhR8AQudjaP4qeH" target="_blank" style="display: inline-block; background-color: #15151A; color: #F4F2ED; padding: 10px 20px; text-decoration: none; border-radius: 30px; font-weight: bold; font-size: 12px; margin: 0 6px; border: 1px solid rgba(255, 90, 31, 0.2); letter-spacing: 0.02em;">
+          <a href="https://chat.whatsapp.com/HKekz4fQhR8AQudjaP4qeH" target="_blank" style="display: inline-block; background-color: #15151A; color: #F4F2ED; padding: 10px 20px; text-decoration: none; border-radius: 30px; font-weight: bold; font-size: 12px; margin: 0 6px;">
             WhatsApp Community
           </a>
         </div>
-
-        <!-- Contact & Store Info -->
         <div style="font-size: 12px; color: #57534e; line-height: 1.6; border-top: 1px solid #DFDBCF; padding-top: 20px; margin-top: 20px;">
-          <p style="margin: 0; font-weight: bold; color: #15151A; font-size: 13px; text-transform: uppercase; letter-spacing: 0.05em;">IQFITS-47 Store</p>
+          <p style="margin: 0; font-weight: bold; color: #15151A; font-size: 13px; text-transform: uppercase;">IQFITS-47 Store</p>
           <p style="margin: 4px 0;">Nairobi, Kenya</p>
           <p style="margin: 4px 0;">WhatsApp/Phone: <a href="https://wa.me/254716672878" style="color: #FF5A1F; text-decoration: none; font-weight: bold;">+254 716 672 878</a></p>
           <p style="margin: 4px 0;">Email: <a href="mailto:support@iqfits47.store" style="color: #FF5A1F; text-decoration: none; font-weight: bold;">support@iqfits47.store</a></p>
         </div>
-
-        <!-- Security/Trust Notes -->
-        <p style="font-size: 10px; color: #7c7c8c; margin-top: 24px; font-family: monospace; text-transform: uppercase; letter-spacing: 0.08em;">
+        <p style="font-size: 10px; color: #7c7c8c; margin-top: 24px; font-family: monospace; text-transform: uppercase;">
           Payments secured via M-Pesa STK Push &bull; 100% Authentic Kicks
         </p>
         <p style="font-size: 10px; color: #a8a29e; margin-top: 8px;">
@@ -122,9 +117,6 @@ function getEmailFooter(): string {
   `;
 }
 
-/**
- * Sends order receipt/confirmation to the customer.
- */
 export async function sendOrderConfirmationEmail(order: Order): Promise<boolean> {
   const itemsList = order.items
     .map(
@@ -165,7 +157,7 @@ export async function sendOrderConfirmationEmail(order: Order): Promise<boolean>
       <p style="margin-top: 0;">Hi <strong>${order.delivery.fullName}</strong>,</p>
       <p>Your payment for order <strong>${order.orderNumber}</strong> has been received successfully. We are now packing your order for delivery!</p>
 
-      <h3 style="border-bottom: 2px solid #15151A; padding-bottom: 8px; margin-top: 30px; font-size: 16px; text-transform: uppercase; letter-spacing: 0.05em;">ORDER SUMMARY</h3>
+      <h3 style="border-bottom: 2px solid #15151A; padding-bottom: 8px; margin-top: 30px; font-size: 16px; text-transform: uppercase;">ORDER SUMMARY</h3>
       <table style="width: 100%; border-collapse: collapse; font-size: 14px;">
         ${itemsList}
         <tr>
@@ -183,7 +175,7 @@ export async function sendOrderConfirmationEmail(order: Order): Promise<boolean>
         </tr>
       </table>
 
-      <h3 style="border-bottom: 2px solid #15151A; padding-bottom: 8px; margin-top: 30px; font-size: 16px; text-transform: uppercase; letter-spacing: 0.05em;">DELIVERY INFORMATION</h3>
+      <h3 style="border-bottom: 2px solid #15151A; padding-bottom: 8px; margin-top: 30px; font-size: 16px; text-transform: uppercase;">DELIVERY INFORMATION</h3>
       <p style="font-size: 14px; line-height: 1.6; margin-bottom: 0; color: #15151A;">
         <strong>Recipient:</strong> ${order.delivery.fullName}<br>
         <strong>Phone:</strong> ${order.delivery.phone}<br>
@@ -194,7 +186,6 @@ export async function sendOrderConfirmationEmail(order: Order): Promise<boolean>
   `;
 
   if (!order.delivery.email) {
-    console.warn("Order does not have a customer email address, skipping confirmation email.");
     return false;
   }
 
@@ -205,9 +196,6 @@ export async function sendOrderConfirmationEmail(order: Order): Promise<boolean>
   });
 }
 
-/**
- * Notifies the store admin about a new paid order.
- */
 export async function sendAdminNewOrderEmail(order: Order): Promise<boolean> {
   const itemsList = order.items
     .map(
@@ -222,13 +210,13 @@ export async function sendAdminNewOrderEmail(order: Order): Promise<boolean> {
       <h2 style="font-size: 20px; margin-top: 0; color: #15151A;">New Order Received: ${order.orderNumber}</h2>
       <p>A new order has been paid and is ready for fulfillment.</p>
       
-      <h3 style="border-bottom: 2px solid #15151A; padding-bottom: 8px; margin-top: 24px; font-size: 14px; text-transform: uppercase; letter-spacing: 0.05em;">Order Details</h3>
+      <h3 style="border-bottom: 2px solid #15151A; padding-bottom: 8px; margin-top: 24px; font-size: 14px; text-transform: uppercase;">Order Details</h3>
       <ul style="padding-left: 20px; color: #15151A;">
         ${itemsList}
       </ul>
       <p style="font-size: 16px;"><strong>Total Amount:</strong> <span style="color: #FF5A1F; font-weight: bold; font-family: monospace;">${formatKES(order.total)}</span></p>
       
-      <h3 style="border-bottom: 2px solid #15151A; padding-bottom: 8px; margin-top: 24px; font-size: 14px; text-transform: uppercase; letter-spacing: 0.05em;">Delivery Address</h3>
+      <h3 style="border-bottom: 2px solid #15151A; padding-bottom: 8px; margin-top: 24px; font-size: 14px; text-transform: uppercase;">Delivery Address</h3>
       <p style="font-size: 14px; line-height: 1.5; color: #15151A;">
         <strong>Name:</strong> ${order.delivery.fullName}<br>
         <strong>Phone:</strong> ${order.delivery.phone}<br>
@@ -238,7 +226,7 @@ export async function sendAdminNewOrderEmail(order: Order): Promise<boolean> {
       </p>
 
       <p style="margin-top: 30px; text-align: center;">
-        <a href="https://iqfits47.store/admin" style="background-color: #FF5A1F; color: #ffffff; padding: 12px 24px; text-decoration: none; border-radius: 30px; font-weight: bold; display: inline-block; font-size: 14px; border: 1px solid #FF5A1F;">
+        <a href="https://iqfits47.store/admin" style="background-color: #FF5A1F; color: #ffffff; padding: 12px 24px; text-decoration: none; border-radius: 30px; font-weight: bold; display: inline-block; font-size: 14px;">
           Go to Admin Console
         </a>
       </p>
@@ -252,9 +240,6 @@ export async function sendAdminNewOrderEmail(order: Order): Promise<boolean> {
   });
 }
 
-/**
- * Notifies the customer about an order status change.
- */
 export async function sendOrderStatusUpdateEmail(order: Order, note?: string): Promise<boolean> {
   const statusLabels: Record<string, string> = {
     processing: "Processing",
@@ -272,7 +257,7 @@ export async function sendOrderStatusUpdateEmail(order: Order, note?: string): P
       <p>The status of your order <strong>${order.orderNumber}</strong> has been updated to:</p>
       
       <div style="background-color: #F4F2ED; border-radius: 12px; padding: 16px; margin: 20px 0; text-align: center; border: 1px solid #DFDBCF;">
-        <span style="font-size: 18px; font-weight: bold; text-transform: uppercase; color: #FF5A1F; letter-spacing: 0.05em;">${currentStatusLabel}</span>
+        <span style="font-size: 18px; font-weight: bold; text-transform: uppercase; color: #FF5A1F;">${currentStatusLabel}</span>
       </div>
 
       ${
@@ -288,7 +273,7 @@ export async function sendOrderStatusUpdateEmail(order: Order, note?: string): P
       <p>You can track your order live on our website using your order number.</p>
       
       <p style="margin-top: 28px; text-align: center;">
-        <a href="https://iqfits47.store/track-order?order=${order.orderNumber}" style="background-color: #15151A; color: #F4F2ED; padding: 12px 24px; text-decoration: none; border-radius: 30px; font-weight: bold; display: inline-block; font-size: 14px; border: 1px solid #FF5A1F;">
+        <a href="https://iqfits47.store/track-order?order=${order.orderNumber}" style="background-color: #15151A; color: #F4F2ED; padding: 12px 24px; text-decoration: none; border-radius: 30px; font-weight: bold; display: inline-block; font-size: 14px;">
           Track Your Order
         </a>
       </p>
@@ -296,7 +281,6 @@ export async function sendOrderStatusUpdateEmail(order: Order, note?: string): P
   `;
 
   if (!order.delivery.email) {
-    console.warn("Order does not have a customer email address, skipping status update email.");
     return false;
   }
 
@@ -307,9 +291,6 @@ export async function sendOrderStatusUpdateEmail(order: Order, note?: string): P
   });
 }
 
-/**
- * Notifies the store admin about a successful referral event.
- */
 export async function sendAdminReferralNotificationEmail(
   affiliateCode: string,
   affiliateName: string,
@@ -335,9 +316,6 @@ export async function sendAdminReferralNotificationEmail(
   });
 }
 
-/**
- * Notifies the store admin about a new affiliate/referral registration.
- */
 export async function sendAdminNewAffiliateNotificationEmail(
   phone: string,
   displayName: string,
@@ -348,7 +326,7 @@ export async function sendAdminNewAffiliateNotificationEmail(
       <p style="margin-top: 0; font-size: 16px;">Hey Admin,</p>
       <p>A new user has registered for the referral program!</p>
       
-      <h3 style="border-bottom: 2px solid #15151A; padding-bottom: 8px; margin-top: 30px; font-size: 14px; text-transform: uppercase; letter-spacing: 0.05em; color: #15151A;">AFFILIATE DETAILS</h3>
+      <h3 style="border-bottom: 2px solid #15151A; padding-bottom: 8px; margin-top: 30px; font-size: 14px; text-transform: uppercase; color: #15151A;">AFFILIATE DETAILS</h3>
       <table style="width: 100%; border-collapse: collapse; font-size: 14px; line-height: 1.6;">
         <tr>
           <td style="padding: 6px 0; font-weight: bold; color: #7c7c8c; width: 140px;">Phone</td>
@@ -373,9 +351,6 @@ export async function sendAdminNewAffiliateNotificationEmail(
   });
 }
 
-/**
- * Notifies the store admin about a new partner application.
- */
 export async function sendAdminPartnerApplicationEmail(app: {
   name: string;
   email: string;
@@ -390,7 +365,7 @@ export async function sendAdminPartnerApplicationEmail(app: {
       <p style="margin-top: 0; font-size: 16px;">Hey Admin,</p>
       <p>A new partnership application has been received from the portal.</p>
 
-      <h3 style="border-bottom: 2px solid #15151A; padding-bottom: 8px; margin-top: 30px; font-size: 14px; text-transform: uppercase; letter-spacing: 0.05em; color: #15151A;">APPLICANT DETAILS</h3>
+      <h3 style="border-bottom: 2px solid #15151A; padding-bottom: 8px; margin-top: 30px; font-size: 14px; text-transform: uppercase; color: #15151A;">APPLICANT DETAILS</h3>
       <table style="width: 100%; border-collapse: collapse; font-size: 14px; line-height: 1.6;">
         <tr>
           <td style="padding: 6px 0; font-weight: bold; color: #7c7c8c; width: 140px;">Name</td>
@@ -398,21 +373,15 @@ export async function sendAdminPartnerApplicationEmail(app: {
         </tr>
         <tr>
           <td style="padding: 6px 0; font-weight: bold; color: #7c7c8c;">Email</td>
-          <td style="padding: 6px 0; color: #15151A;"><a href="mailto:${app.email}" style="color: #FF5A1F; text-decoration: none; font-weight: bold;">${app.email}</a></td>
+          <td style="padding: 6px 0; color: #15151A;"><a href="mailto:${app.email}" style="color: #FF5A1F;">${app.email}</a></td>
         </tr>
         <tr>
           <td style="padding: 6px 0; font-weight: bold; color: #7c7c8c;">Phone</td>
           <td style="padding: 6px 0; color: #15151A;">${app.phone}</td>
         </tr>
         <tr>
-          <td style="padding: 6px 0; font-weight: bold; color: #7c7c8c;">Company / Brand</td>
+          <td style="padding: 6px 0; font-weight: bold; color: #7c7c8c;">Company</td>
           <td style="padding: 6px 0; color: #15151A;">${app.company || "Not provided"}</td>
-        </tr>
-        <tr>
-          <td style="padding: 6px 0; font-weight: bold; color: #7c7c8c;">Website / Socials</td>
-          <td style="padding: 6px 0; color: #15151A;">
-            ${app.website ? `<a href="${app.website.startsWith("http") ? app.website : "https://" + app.website}" target="_blank" style="color: #FF5A1F; text-decoration: none; font-weight: bold;">${app.website}</a>` : "Not provided"}
-          </td>
         </tr>
         <tr>
           <td style="padding: 6px 0; font-weight: bold; color: #7c7c8c;">Partnership Type</td>
@@ -420,8 +389,8 @@ export async function sendAdminPartnerApplicationEmail(app: {
         </tr>
       </table>
 
-      <h3 style="border-bottom: 2px solid #15151A; padding-bottom: 8px; margin-top: 30px; font-size: 14px; text-transform: uppercase; letter-spacing: 0.05em; color: #15151A;">PROPOSAL / MESSAGE</h3>
-      <div style="background-color: #F4F2ED; border-radius: 12px; padding: 16px; margin-top: 10px; font-size: 14px; line-height: 1.5; color: #15151A; white-space: pre-wrap; border: 1px solid #DFDBCF;">${app.message}</div>
+      <h3 style="border-bottom: 2px solid #15151A; padding-bottom: 8px; margin-top: 30px; font-size: 14px; text-transform: uppercase; color: #15151A;">PROPOSAL</h3>
+      <div style="background-color: #F4F2ED; border-radius: 12px; padding: 16px; margin-top: 10px; font-size: 14px; line-height: 1.5; color: #15151A; white-space: pre-wrap;">${app.message}</div>
     ${getEmailFooter()}
   `;
 
@@ -432,9 +401,6 @@ export async function sendAdminPartnerApplicationEmail(app: {
   });
 }
 
-/**
- * Sends a confirmation email to the partner applicant.
- */
 export async function sendPartnerConfirmationEmail(app: {
   name: string;
   email: string;
@@ -444,18 +410,7 @@ export async function sendPartnerConfirmationEmail(app: {
     ${getEmailHeader(`Application Received`, `Application Received`)}
       <p style="margin-top: 0;">Hi <strong>${app.name}</strong>,</p>
       <p>Thank you for your interest in partnering with <strong>IQFITS-47</strong>!</p>
-      <p>We've successfully received your application to join us as a <strong style="text-transform: uppercase; color: #FF5A1F;">${app.partnershipType.replace(/_/g, " ")}</strong>.</p>
-      
-      <div style="background-color: #F4F2ED; border-radius: 12px; padding: 20px; margin: 24px 0; border: 1px solid #DFDBCF; font-size: 14px; line-height: 1.5; color: #15151A;">
-        <p style="margin-top: 0; font-weight: bold; color: #15151A; text-transform: uppercase; font-size: 12px; letter-spacing: 0.05em;">What happens next?</p>
-        <ol style="margin-bottom: 0; padding-left: 20px; color: #57534e;">
-          <li style="margin-bottom: 6px;">Our team will review your application details and proposal.</li>
-          <li style="margin-bottom: 6px;">We will assess how your style/brand aligns with our upcoming drops.</li>
-          <li>We will get in touch with you via email or phone within 3-5 business days.</li>
-        </ol>
-      </div>
-
-      <p>If you have any questions or would like to send additional portfolio materials, feel free to reply directly to this email or chat with us on WhatsApp.</p>
+      <p>We've received your application to join us as a <strong style="text-transform: uppercase; color: #FF5A1F;">${app.partnershipType.replace(/_/g, " ")}</strong>.</p>
     ${getEmailFooter()}
   `;
 
@@ -466,69 +421,99 @@ export async function sendPartnerConfirmationEmail(app: {
   });
 }
 
-/**
- * Sends a status update email to the partner applicant when accepted/rejected.
- */
 export async function sendPartnerStatusUpdateEmail(
   app: { name: string; email: string; partnershipType: string },
   status: "accepted" | "rejected" | "reviewed"
 ): Promise<boolean> {
-  let subtitleText = "Application Update";
-  let subjectText = `Partnership Application Update — [IQFITS-47]`;
-  let statusHtml = "";
-
-  if (status === "accepted") {
-    subtitleText = "Application Approved";
-    subjectText = `Partnership Application Approved! 🎉 [IQFITS-47]`;
-    statusHtml = `
-      <div style="background-color: #f0fdf4; border-radius: 12px; padding: 20px; margin: 24px 0; border: 1px solid #bbf7d0; font-size: 14px; line-height: 1.6; color: #15803d;">
-        <p style="margin-top: 0; font-size: 16px; font-weight: bold; text-transform: uppercase; letter-spacing: 0.05em; color: #166534;">Congratulations! Your application has been ACCEPTED.</p>
-        <p style="margin-bottom: 16px; color: #166534;">We are thrilled to welcome you to the IQFITS-47 circle. A member of our team will contact you in the next 24-48 hours to discuss next steps, share exclusive codes, and set up our onboarding call.</p>
-        <p style="margin-bottom: 0; text-align: center;">
-          <a href="https://iqfits47.store/partner/onboarding?name=${encodeURIComponent(app.name)}&type=${encodeURIComponent(app.partnershipType)}" style="background-color: #FF5A1F; color: #ffffff; padding: 12px 24px; text-decoration: none; border-radius: 30px; font-weight: bold; display: inline-block; font-size: 14px; border: 1px solid #FF5A1F;">
-            Start Onboarding Setup
-          </a>
-        </p>
-      </div>
-    `;
-  } else if (status === "reviewed") {
-    subtitleText = "Application Under Review";
-    subjectText = `Partnership Application Under Review ⏳ [IQFITS-47]`;
-    statusHtml = `
-      <div style="background-color: #fffbeb; border-radius: 12px; padding: 20px; margin: 24px 0; border: 1px solid #fef3c7; font-size: 14px; line-height: 1.6; color: #92400e;">
-        <p style="margin-top: 0; font-size: 16px; font-weight: bold; text-transform: uppercase; letter-spacing: 0.05em; color: #d97706;">Application Under Review ⏳</p>
-        <p style="margin-bottom: 12px; color: #78350f;">Great news! We have started reviewing your application. Our creative team is currently evaluating your profile, social handles, and proposal to see how they align with our upcoming drops and brand vibe.</p>
-        <p style="margin-bottom: 0; color: #78350f;">No further action is required from you at this moment. We will update you as soon as the review is complete (usually within 3-5 business days). Thank you for your patience!</p>
-      </div>
-    `;
-  } else {
-    // rejected
-    subtitleText = "Application Update";
-    subjectText = `Partnership Application Update — [IQFITS-47]`;
-    statusHtml = `
-      <div style="background-color: #fafaf9; border-radius: 12px; padding: 20px; margin: 24px 0; border: 1px solid #e7e5e4; font-size: 14px; line-height: 1.6; color: #57534e;">
-        <p style="margin-top: 0; font-weight: bold; color: #1c1917; text-transform: uppercase; font-size: 12px; letter-spacing: 0.05em; color: #44403c;">Update on your application:</p>
-        <p style="margin-bottom: 0;">At this time, we are unable to move forward with an active partnership. However, we were highly impressed by your profile and will keep your contact details and proposal on file as new drops and campaigns roll out in the future.</p>
-      </div>
-    `;
-  }
-
   const html = `
-    ${getEmailHeader(`Partnership Update`, subtitleText)}
+    ${getEmailHeader(`Partnership Update`, `Application Update`)}
       <p style="margin-top: 0;">Hi <strong>${app.name}</strong>,</p>
-      <p>We are writing to update you on your partnership application with <strong>IQFITS-47</strong> as a <strong style="text-transform: uppercase; color: #FF5A1F;">${app.partnershipType.replace(/_/g, " ")}</strong>.</p>
-      
-      ${statusHtml}
-
-      <p>Thank you again for connecting with us. We appreciate your passion and support for our brand!</p>
+      <p>Your application status is now: <strong style="text-transform: uppercase; color: #FF5A1F;">${status}</strong>.</p>
     ${getEmailFooter()}
   `;
 
   return sendEmail({
     to: app.email,
-    subject: subjectText,
+    subject: `Partnership Application Update — [IQFITS-47]`,
     html,
   });
 }
 
+export async function sendBookingConfirmationEmail(booking: {
+  booking_ref: string;
+  full_name: string;
+  email?: string | null;
+  booking_type: string;
+  tattoo_style: string;
+  tattoo_size: string;
+  body_placement: string;
+  preferred_date?: string | null;
+}): Promise<boolean> {
+  if (!booking.email) return false;
 
+  const html = `
+    <div style="font-family: 'Space Grotesk', sans-serif; background-color: #070709; color: #f5f5f7; padding: 32px; max-width: 600px; margin: 0 auto; border-radius: 16px;">
+      <div style="text-align: center; border-bottom: 2px solid #ff5500; padding-bottom: 20px; margin-bottom: 24px;">
+        <h1 style="font-size: 28px; margin: 0; color: #fff;">47<span style="color: #ff5500;">STUDIO</span></h1>
+        <p style="color: #ff5500; font-size: 11px; font-family: monospace; text-transform: uppercase;">47Cultures & Ink • Nairobi</p>
+      </div>
+
+      <div style="background-color: rgba(255,85,0,0.1); border: 1px solid rgba(255,85,0,0.3); padding: 20px; border-radius: 12px; text-align: center; margin-bottom: 24px;">
+        <p style="color: #ff5500; font-family: monospace; font-size: 11px; text-transform: uppercase; margin: 0;">BOOKING REF</p>
+        <h2 style="font-size: 24px; color: #fff; font-family: monospace; margin: 4px 0 0 0;">${booking.booking_ref}</h2>
+      </div>
+
+      <p>Habari <strong>${booking.full_name}</strong>, your ${booking.booking_type === "tour" ? "Kenya Tour" : "Studio Session"} booking has been received!</p>
+
+      <table style="width: 100%; border-collapse: collapse; margin: 20px 0; font-size: 14px; background: #12121c; padding: 16px; border-radius: 10px;">
+        <tr><td style="color: #888; padding: 6px;">Style:</td><td style="font-weight: bold; color: #fff; text-align: right;">${booking.tattoo_style}</td></tr>
+        <tr><td style="color: #888; padding: 6px;">Size:</td><td style="color: #fff; text-align: right;">${booking.tattoo_size}</td></tr>
+        <tr><td style="color: #888; padding: 6px;">Placement:</td><td style="color: #fff; text-align: right;">${booking.body_placement}</td></tr>
+        ${booking.preferred_date ? `<tr><td style="color: #888; padding: 6px;">Date:</td><td style="color: #ff5500; font-weight: bold; text-align: right;">${booking.preferred_date}</td></tr>` : ""}
+      </table>
+
+      <div style="text-align: center; margin-top: 28px;">
+        <a href="https://www.instagram.com/47.studio._/" style="background-color: #ff5500; color: #fff; text-decoration: none; padding: 12px 28px; border-radius: 30px; font-weight: bold; display: inline-block;">
+          DM Us On Instagram @47.studio._
+        </a>
+      </div>
+    </div>
+  `;
+
+  return sendEmail({
+    to: booking.email,
+    subject: `47Studio Tattoo Booking Confirmation #${booking.booking_ref}`,
+    html,
+    from: STUDIO_SENDER,
+  });
+}
+
+export async function sendAdminNewBookingEmail(booking: {
+  booking_ref: string;
+  full_name: string;
+  phone: string;
+  email?: string | null;
+  booking_type: string;
+  tattoo_style: string;
+  tattoo_size: string;
+  body_placement: string;
+  design_description: string;
+}): Promise<boolean> {
+  const html = `
+    <h2>💉 New 47Studio Tattoo Booking #${booking.booking_ref}</h2>
+    <p><strong>Client:</strong> ${booking.full_name} (${booking.phone}, ${booking.email || "No email"})</p>
+    <p><strong>Type:</strong> ${booking.booking_type}</p>
+    <p><strong>Style:</strong> ${booking.tattoo_style}</p>
+    <p><strong>Size:</strong> ${booking.tattoo_size}</p>
+    <p><strong>Placement:</strong> ${booking.body_placement}</p>
+    <p><strong>Design Idea:</strong> ${booking.design_description}</p>
+    <p><a href="https://iqfits47.store/studio">Manage in 47Studio Console</a></p>
+  `;
+
+  return sendEmail({
+    to: STUDIO_ADMIN_EMAIL,
+    subject: `💉 New 47Studio Booking #${booking.booking_ref} - ${booking.full_name}`,
+    html,
+    from: STUDIO_SENDER,
+  });
+}

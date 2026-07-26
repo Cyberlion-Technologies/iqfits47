@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabaseServer, isSupabaseServerConfigured } from "@/lib/supabase/server";
 import { cookies } from "next/headers";
+import { sendBookingStatusUpdateSMS } from "@/lib/sms";
+import { sendEmail } from "@/lib/mail";
 
 const ADMIN_COOKIE = "iqfits_admin_token";
 const ADMIN_PASSCODE = process.env.ADMIN_PASSCODE;
@@ -95,6 +97,35 @@ export async function PATCH(req: NextRequest) {
       .single();
 
     if (error) throw error;
+
+    // ── Notify client via SMS & Email on status change ────────────────────────
+    if (data?.phone) {
+      sendBookingStatusUpdateSMS(data.phone, data.full_name, data.booking_ref, status).catch((e) =>
+        console.error("Booking status SMS notify error:", e)
+      );
+    }
+
+    if (data?.email && data.email.includes("@")) {
+      const formattedStatus = status.replace(/_/g, " ").toUpperCase();
+      const studioSender = process.env.STUDIO_FROM_EMAIL || "47Studio <bookings@iqfits47.store>";
+      const html = `
+        <div style="font-family: sans-serif; background-color: #070709; color: #fff; padding: 24px; border-radius: 12px; border: 1px solid #222;">
+          <h2 style="color: #ff5500;">47Studio Booking Update: #${data.booking_ref}</h2>
+          <p>Habari ${data.full_name},</p>
+          <p>Your tattoo booking status has been updated to: <strong style="color: #ff5500;">${formattedStatus}</strong>.</p>
+          <p>For questions or design changes, DM us on Instagram <a href="https://www.instagram.com/47.studio._/" style="color: #ff5500;">@47.studio._</a>.</p>
+          <p style="font-size: 11px; color: #666;">47Cultures & Ink • Nairobi, Kenya</p>
+        </div>
+      `;
+
+      sendEmail({
+        to: data.email,
+        subject: `47Studio Booking #${data.booking_ref} Status: ${formattedStatus}`,
+        html,
+        from: studioSender,
+      }).catch((e) => console.error("Booking status Email notify error:", e));
+    }
+
     return NextResponse.json({ booking: data });
   } catch (err) {
     console.error("Studio admin PATCH error:", err);
@@ -113,12 +144,21 @@ export async function DELETE(req: NextRequest) {
   if (!id) return NextResponse.json({ error: "id required" }, { status: 400 });
 
   try {
-    const { error } = await supabaseServer
+    const { data, error } = await supabaseServer
       .from("studio_bookings")
       .update({ status: "cancelled" })
-      .eq("id", id);
+      .eq("id", id)
+      .select()
+      .single();
 
     if (error) throw error;
+
+    if (data?.phone) {
+      sendBookingStatusUpdateSMS(data.phone, data.full_name, data.booking_ref, "cancelled").catch((e) =>
+        console.error("Booking cancellation SMS notify error:", e)
+      );
+    }
+
     return NextResponse.json({ success: true });
   } catch (err) {
     console.error("Studio admin DELETE error:", err);

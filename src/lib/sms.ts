@@ -9,6 +9,7 @@
 const TEXTSMS_API_KEY = process.env.TEXTSMS_API_KEY || "";
 const TEXTSMS_PARTNER_ID = process.env.TEXTSMS_PARTNER_ID || "";
 const TEXTSMS_SENDER_ID = process.env.TEXTSMS_SENDER_ID || ""; // shortcode / Sender ID
+const STUDIO_ADMIN_PHONE = process.env.STUDIO_ADMIN_PHONE || process.env.ADMIN_PHONE || "254716672878";
 
 interface SendSMSParams {
   mobile: string; // Phone number (will be normalized)
@@ -69,7 +70,6 @@ export async function sendSMS({ mobile, message }: SendSMSParams): Promise<boole
     const data = await res.json().catch(() => ({}));
     const responseDetail = data?.responses?.[0];
     const responseCode = responseDetail?.["respose-code"] ?? responseDetail?.["response-code"];
-    const responseDescription = responseDetail?.["response-description"] ?? responseDetail?.["response-description"];
 
     if (responseCode === 200 || responseCode === "200") {
       return true;
@@ -187,3 +187,52 @@ export async function sendAdminNewOrderSMS(order: any): Promise<boolean> {
   });
 }
 
+/**
+ * Helper to notify studio client on booking confirmation.
+ */
+export async function sendBookingConfirmationSMS(booking: {
+  booking_ref: string;
+  full_name: string;
+  phone: string;
+  tattoo_style: string;
+}): Promise<boolean> {
+  const message = `Habari ${booking.full_name}! Your 47Studio tattoo booking #${booking.booking_ref} (${booking.tattoo_style}) is received. We'll contact you on IG/WA to confirm your slot. DM @47.studio._`;
+  return sendSMS({
+    mobile: booking.phone,
+    message,
+  });
+}
+
+/**
+ * Helper to notify studio admin of a new booking.
+ */
+export async function sendAdminNewBookingSMS(booking: {
+  booking_ref: string;
+  full_name: string;
+  phone: string;
+  tattoo_style: string;
+  tattoo_size: string;
+}): Promise<boolean> {
+  const message = `[47STUDIO BOOKING] #${booking.booking_ref} by ${booking.full_name} (${booking.phone}). Style: ${booking.tattoo_style}, Size: ${booking.tattoo_size}. Review in studio admin.`;
+  return sendSMS({
+    mobile: STUDIO_ADMIN_PHONE,
+    message,
+  });
+}
+
+/**
+ * Helper to notify studio client on booking status change.
+ */
+export async function sendBookingStatusUpdateSMS(
+  phone: string,
+  clientName: string,
+  bookingRef: string,
+  status: string
+): Promise<boolean> {
+  const formattedStatus = status.replace(/_/g, " ").toUpperCase();
+  const message = `Habari ${clientName}, your 47Studio tattoo booking #${bookingRef} status updated to: ${formattedStatus}. DM @47.studio._ on IG for details.`;
+  return sendSMS({
+    mobile: phone,
+    message,
+  });
+}

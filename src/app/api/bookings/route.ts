@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabaseServer, isSupabaseServerConfigured } from "@/lib/supabase/server";
+import { sendBookingConfirmationEmail, sendAdminNewBookingEmail } from "@/lib/mail";
+import { sendBookingConfirmationSMS, sendAdminNewBookingSMS } from "@/lib/sms";
 
 export async function POST(req: NextRequest) {
   try {
@@ -108,6 +110,28 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // ── Trigger Email & SMS Notifications ─────────────────────────────────────
+    const payload = {
+      booking_ref: booking.booking_ref,
+      full_name: full_name.trim(),
+      phone: phone.trim(),
+      email: email?.trim() || null,
+      booking_type: booking_type || "studio",
+      tattoo_style,
+      tattoo_size,
+      body_placement: body_placement.trim(),
+      design_description: design_description.trim(),
+      preferred_date: booking_type === "studio" ? preferred_date : null,
+    };
+
+    // Send notifications concurrently without blocking the HTTP response
+    Promise.allSettled([
+      sendBookingConfirmationEmail(payload),
+      sendAdminNewBookingEmail(payload),
+      sendBookingConfirmationSMS(payload),
+      sendAdminNewBookingSMS(payload),
+    ]).catch((err) => console.error("Notification dispatch error:", err));
+
     return NextResponse.json({ booking }, { status: 201 });
   } catch (err) {
     console.error("Booking API error:", err);
@@ -122,7 +146,6 @@ export async function POST(req: NextRequest) {
 export async function GET() {
   try {
     if (!isSupabaseServerConfigured()) {
-      // Return seeded fallback data so the page still renders
       return NextResponse.json({ tourDates: [] });
     }
 
