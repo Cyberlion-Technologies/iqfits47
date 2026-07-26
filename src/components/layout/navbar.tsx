@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { Menu, X, ShoppingBag, Search, Package, Heart } from "lucide-react";
+import { Menu, X, ShoppingBag, Search, Package, Heart, Syringe } from "lucide-react";
 import { useCart } from "@/lib/store/cart";
 import { useFeatures } from "@/lib/store/features";
 import { cn } from "@/lib/utils";
@@ -27,6 +27,7 @@ const links = [
   { href: "/shop?category=sneakers", label: "Kicks" },
   { href: "/shop?category=apparel", label: "Apparel" },
   { href: "/shop?category=accessories", label: "Accessories" },
+  { href: "/bookings", label: "47Studio", highlight: true },
 ];
 
 export function Navbar() {
@@ -163,7 +164,15 @@ export function Navbar() {
 
         <nav className="hidden items-center gap-8 font-display text-sm uppercase tracking-wide lg:flex">
           {links.map((l) => (
-            <Link key={l.label} href={l.href} className="transition-colors hover:text-hazard">
+            <Link
+              key={l.label}
+              href={l.href}
+              className={cn(
+                "transition-colors hover:text-hazard",
+                l.highlight && "flex items-center gap-1.5 text-hazard"
+              )}
+            >
+              {l.highlight && <Syringe size={13} />}
               {l.label}
             </Link>
           ))}
@@ -245,10 +254,12 @@ export function Navbar() {
                     href={l.href}
                     onClick={() => setMenuOpen(false)}
                     className={cn(
-                      "border-b border-ink/10 py-4 font-display text-2xl uppercase tracking-tight text-ink hover:text-hazard transition-colors"
+                      "border-b border-ink/10 py-4 font-display text-2xl uppercase tracking-tight transition-colors",
+                      l.highlight ? "text-hazard" : "text-ink hover:text-hazard"
                     )}
                   >
                     <span className="mr-3 font-mono text-xs text-ink/40">0{i + 1}</span>
+                    {l.highlight && <Syringe size={16} className="mr-1 inline" />}
                     {l.label}
                   </Link>
                 ))}
