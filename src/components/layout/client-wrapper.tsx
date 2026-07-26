@@ -2,6 +2,7 @@
 
 import React, { Suspense } from "react";
 import dynamic from "next/dynamic";
+import { usePathname } from "next/navigation";
 import { ReferralCapture } from "@/components/layout/referral-capture";
 
 const Navbar = dynamic(() => import("@/components/layout/navbar").then((m) => m.Navbar), { ssr: false });
@@ -10,6 +11,10 @@ const ToasterClient = dynamic(() => import("@/components/layout/toaster-client")
 const CompareDrawer = dynamic(() => import("@/components/product/compare-drawer").then((m) => m.CompareDrawer), { ssr: false });
 
 export function ClientWrapper({ children }: { children: React.ReactNode }) {
+  const pathname = usePathname();
+
+  const isStudioPage = pathname === "/bookings" || pathname?.startsWith("/studio");
+
   React.useEffect(() => {
     if (typeof window !== "undefined" && "serviceWorker" in navigator) {
       navigator.serviceWorker
@@ -25,11 +30,11 @@ export function ClientWrapper({ children }: { children: React.ReactNode }) {
       <Suspense fallback={null}>
         <ReferralCapture />
       </Suspense>
-      <Navbar />
+      {!isStudioPage && <Navbar />}
       <main className="min-h-[60vh]">{children}</main>
-      <CartDrawer />
+      {!isStudioPage && <CartDrawer />}
       <ToasterClient />
-      <CompareDrawer />
+      {!isStudioPage && <CompareDrawer />}
     </>
   );
 }

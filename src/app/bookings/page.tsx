@@ -1,8 +1,10 @@
 import type { Metadata } from "next";
+import { StudioNavbar } from "@/components/bookings/studio-navbar";
 import { BookingsHero } from "@/components/bookings/bookings-hero";
 import { BookingsTabs } from "@/components/bookings/bookings-tabs";
 import { InkGallery } from "@/components/bookings/ink-gallery";
 import { StudioCta } from "@/components/bookings/studio-cta";
+import { StudioFooter } from "@/components/bookings/studio-footer";
 
 export const metadata: Metadata = {
   title: "Book a Tattoo — 47Studio",
@@ -19,11 +21,17 @@ export const metadata: Metadata = {
 
 export default function BookingsPage() {
   return (
-    <main className="bg-ink text-stone-50 min-h-screen">
-      <BookingsHero />
-      <BookingsTabs />
-      <InkGallery />
-      <StudioCta />
-    </main>
+    <div className="bg-[#0a0a0c] text-stone-50 min-h-screen selection:bg-hazard selection:text-white">
+      <StudioNavbar />
+      <main>
+        <BookingsHero />
+        <BookingsTabs />
+        <section id="portfolio">
+          <InkGallery />
+        </section>
+        <StudioCta />
+      </main>
+      <StudioFooter />
+    </div>
   );
 }

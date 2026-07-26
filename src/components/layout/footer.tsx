@@ -1,12 +1,18 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { MapPin, Package, Gift, Mail, Syringe } from "lucide-react";
 import { InstagramIcon } from "@/components/ui/instagram-icon";
 import { DeveloperCTA } from "./developer-cta";
 import { PWAInstall } from "./pwa-install";
 
 export function Footer() {
+  const pathname = usePathname();
+
+  if (pathname === "/bookings" || pathname?.startsWith("/studio")) {
+    return null;
+  }
   return (
     <footer className="mt-24 border-t border-ink/10 bg-ink text-stone-50">
       <div className="mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8">
