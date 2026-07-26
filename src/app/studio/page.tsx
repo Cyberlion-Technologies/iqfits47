@@ -10,6 +10,7 @@ import {
   LogOut, ChevronDown, ExternalLink, X, Check, Loader2,
   TrendingUp, AlertCircle, Phone, Mail, FileText, Plus,
   DollarSign, Tag, Settings, Edit3, Trash2, ShieldCheck,
+  MessageSquare, Smartphone, Eye, Sparkles,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
@@ -104,10 +105,6 @@ const STYLE_LABELS: Record<string, string> = {
 
 const SIZE_LABELS: Record<string, string> = {
   small: "Small", medium: "Medium", large: "Large", sleeve: "Sleeve", full_back: "Full Back",
-};
-
-const TIME_LABELS: Record<string, string> = {
-  morning: "Morning", afternoon: "Afternoon", evening: "Evening",
 };
 
 function formatDate(d: string) {
@@ -350,7 +347,6 @@ export default function StudioAdminPage() {
     router.push("/admin/login");
   }
 
-  // Filtered Bookings
   const filteredBookings = bookings.filter((b) => {
     const typeMatch = activeTab === "studio" ? b.booking_type === "studio"
       : activeTab === "tour" ? b.booking_type === "tour" : true;
@@ -589,7 +585,7 @@ export default function StudioAdminPage() {
                         </td>
                         <td className="py-3.5 pl-3 pr-4 text-right">
                           <button className="rounded-lg p-1.5 hover:bg-stone-50/10 text-stone-50/40 hover:text-stone-50">
-                            <ExternalLink size={14} />
+                            <Eye size={14} />
                           </button>
                         </td>
                       </tr>
@@ -880,6 +876,120 @@ export default function StudioAdminPage() {
         )}
 
       </main>
+
+      {/* ── BOOKING DETAIL SLIDE-OVER DRAWER ────────────────────────── */}
+      <AnimatePresence>
+        {selectedBooking && (
+          <div className="fixed inset-0 z-50 flex justify-end">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setSelectedBooking(null)}
+              className="absolute inset-0 bg-black/70 backdrop-blur-sm"
+            />
+
+            <motion.div
+              initial={{ x: "100%" }}
+              animate={{ x: 0 }}
+              exit={{ x: "100%" }}
+              transition={{ type: "spring", damping: 25, stiffness: 200 }}
+              className="relative z-10 w-full max-w-md bg-[#0d0d12] border-l border-stone-50/10 p-6 flex flex-col h-full overflow-y-auto"
+            >
+              <div className="flex items-center justify-between pb-4 border-b border-stone-50/10">
+                <div>
+                  <span className="font-mono text-xs text-hazard uppercase tracking-wider">{selectedBooking.booking_ref}</span>
+                  <h3 className="font-display text-2xl uppercase tracking-tight">{selectedBooking.full_name}</h3>
+                </div>
+                <button onClick={() => setSelectedBooking(null)} className="rounded-full p-2 hover:bg-stone-50/10 text-stone-50/50 hover:text-stone-50">
+                  <X size={18} />
+                </button>
+              </div>
+
+              <div className="py-6 space-y-6 flex-1">
+                {/* Contact Quick Buttons */}
+                <div className="grid grid-cols-2 gap-3">
+                  <a
+                    href={`https://wa.me/${selectedBooking.phone.replace(/\D/g, "")}?text=${encodeURIComponent(`Habari ${selectedBooking.full_name}, regarding your 47Studio tattoo booking ${selectedBooking.booking_ref}:`)}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center justify-center gap-2 rounded-xl bg-lime/10 border border-lime/30 py-2.5 font-mono text-xs uppercase tracking-wider text-lime hover:bg-lime/20 transition-colors"
+                  >
+                    <MessageSquare size={14} /> WhatsApp
+                  </a>
+                  <a
+                    href={`tel:${selectedBooking.phone}`}
+                    className="flex items-center justify-center gap-2 rounded-xl border border-stone-50/15 py-2.5 font-mono text-xs uppercase tracking-wider text-stone-50/80 hover:bg-stone-50/10 transition-colors"
+                  >
+                    <Phone size={14} /> Call Client
+                  </a>
+                </div>
+
+                {/* Booking Status Action Switcher */}
+                <div>
+                  <label className="block font-mono text-[10px] uppercase text-stone-50/40 mb-2">Update Booking Status</label>
+                  <div className="grid grid-cols-2 gap-2">
+                    {(Object.keys(STATUS_CONFIG) as BookingStatus[]).map((st) => (
+                      <button
+                        key={st}
+                        onClick={() => handleBookingStatusChange(selectedBooking.id, st)}
+                        className={cn(
+                          "rounded-xl border py-2 px-3 font-mono text-xs uppercase tracking-wider transition-all text-center",
+                          selectedBooking.status === st
+                            ? STATUS_CONFIG[st].color + " ring-1 ring-hazard"
+                            : "border-stone-50/10 text-stone-50/40 hover:text-stone-50 hover:border-stone-50/20"
+                        )}
+                      >
+                        {STATUS_CONFIG[st].label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Specs */}
+                <div className="rounded-xl border border-stone-50/10 bg-stone-50/[0.03] p-4 space-y-3 font-mono text-xs">
+                  <div className="flex justify-between border-b border-stone-50/5 pb-2">
+                    <span className="text-stone-50/40">Style:</span>
+                    <span className="font-bold text-stone-50/90">{STYLE_LABELS[selectedBooking.tattoo_style] ?? selectedBooking.tattoo_style}</span>
+                  </div>
+                  <div className="flex justify-between border-b border-stone-50/5 pb-2">
+                    <span className="text-stone-50/40">Size:</span>
+                    <span className="text-stone-50/90">{SIZE_LABELS[selectedBooking.tattoo_size] ?? selectedBooking.tattoo_size}</span>
+                  </div>
+                  <div className="flex justify-between border-b border-stone-50/5 pb-2">
+                    <span className="text-stone-50/40">Placement:</span>
+                    <span className="text-stone-50/90">{selectedBooking.body_placement}</span>
+                  </div>
+                  <div className="flex justify-between border-b border-stone-50/5 pb-2">
+                    <span className="text-stone-50/40">Type:</span>
+                    <span className="text-hazard font-bold uppercase">{selectedBooking.booking_type}</span>
+                  </div>
+                  {selectedBooking.preferred_date && (
+                    <div className="flex justify-between border-b border-stone-50/5 pb-2">
+                      <span className="text-stone-50/40">Requested Date:</span>
+                      <span className="text-stone-50/90">{formatDate(selectedBooking.preferred_date)}</span>
+                    </div>
+                  )}
+                  {selectedBooking.deposit_amount && (
+                    <div className="flex justify-between pt-1">
+                      <span className="text-stone-50/40">Deposit Amount:</span>
+                      <span className="text-lime font-bold">KES {selectedBooking.deposit_amount.toLocaleString()}</span>
+                    </div>
+                  )}
+                </div>
+
+                {/* Design Description */}
+                <div>
+                  <label className="block font-mono text-[10px] uppercase text-stone-50/40 mb-1">Design Idea</label>
+                  <div className="rounded-xl border border-stone-50/10 bg-stone-50/5 p-4 text-xs text-stone-50/80 leading-relaxed">
+                    {selectedBooking.design_description}
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
 
       {/* ── TOUR MODAL ────────────────────────────────────────────────── */}
       <AnimatePresence>
