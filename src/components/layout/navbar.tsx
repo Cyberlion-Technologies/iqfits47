@@ -22,12 +22,17 @@ const WhatsAppIcon = ({ size = 16 }: { size?: number }) => (
   </svg>
 );
 
-const links = [
+interface NavLink {
+  href: string;
+  label: string;
+  highlight?: boolean;
+}
+
+const links: NavLink[] = [
   { href: "/shop", label: "Shop All" },
   { href: "/shop?category=sneakers", label: "Kicks" },
   { href: "/shop?category=apparel", label: "Apparel" },
   { href: "/shop?category=accessories", label: "Accessories" },
-  { href: "/bookings", label: "47Studio", highlight: true },
 ];
 
 export function Navbar() {

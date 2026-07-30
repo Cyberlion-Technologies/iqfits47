@@ -8,7 +8,7 @@ import { sendSMS } from "./textsms";
 import { sendEmail } from "./resend";
 import { renderOrderEmailHtml, renderBookingEmailHtml } from "./templates";
 
-const STORE_ADMIN_EMAIL = process.env.ADMIN_NOTIFY_EMAIL || "support@iqfits47.store";
+const STORE_ADMIN_EMAIL = process.env.ADMIN_NOTIFY_EMAIL || "iqfits47@gmail.com";
 const STORE_ADMIN_PHONE = process.env.ADMIN_NOTIFY_PHONE || "254716672878";
 
 const STUDIO_ADMIN_EMAIL = process.env.STUDIO_ADMIN_EMAIL || STORE_ADMIN_EMAIL;

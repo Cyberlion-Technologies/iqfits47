@@ -517,3 +517,47 @@ export async function sendAdminNewBookingEmail(booking: {
     from: STUDIO_SENDER,
   });
 }
+
+export async function sendAdminBookingStatusUpdateEmail(booking: {
+  booking_ref: string;
+  full_name: string;
+  status: string;
+  notes?: string | null;
+}): Promise<boolean> {
+  const formattedStatus = booking.status.replace(/_/g, " ").toUpperCase();
+  const html = `
+    <h2>🔄 47Studio Booking Status Update #${booking.booking_ref}</h2>
+    <p><strong>Client:</strong> ${booking.full_name}</p>
+    <p><strong>New Status:</strong> <strong style="color: #ff5500;">${formattedStatus}</strong></p>
+    ${booking.notes ? `<p><strong>Notes:</strong> ${booking.notes}</p>` : ""}
+    <p><a href="https://iqfits47.store/studio">Manage in 47Studio Console</a></p>
+  `;
+
+  return sendEmail({
+    to: STUDIO_ADMIN_EMAIL,
+    subject: `🔄 47Studio Booking #${booking.booking_ref} Status: ${formattedStatus}`,
+    html,
+    from: STUDIO_SENDER,
+  });
+}
+
+export async function sendAdminBookingCancelledEmail(booking: {
+  booking_ref: string;
+  full_name: string;
+  notes?: string | null;
+}): Promise<boolean> {
+  const html = `
+    <h2 style="color: #ef4444;">❌ 47Studio Booking Cancelled #${booking.booking_ref}</h2>
+    <p><strong>Client:</strong> ${booking.full_name}</p>
+    <p><strong>Status:</strong> CANCELLED</p>
+    ${booking.notes ? `<p><strong>Notes:</strong> ${booking.notes}</p>` : ""}
+    <p><a href="https://iqfits47.store/studio">Manage in 47Studio Console</a></p>
+  `;
+
+  return sendEmail({
+    to: STUDIO_ADMIN_EMAIL,
+    subject: `❌ 47Studio Booking Cancelled #${booking.booking_ref} - ${booking.full_name}`,
+    html,
+    from: STUDIO_SENDER,
+  });
+}

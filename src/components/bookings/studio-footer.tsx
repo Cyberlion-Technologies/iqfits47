@@ -102,9 +102,6 @@ export function StudioFooter() {
             <Link href="/" className="hover:text-stone-50 transition-colors">
               IQFITS-47 Store
             </Link>
-            <Link href="/studio" className="hover:text-stone-50 transition-colors">
-              Studio Console
-            </Link>
           </div>
         </div>
       </div>

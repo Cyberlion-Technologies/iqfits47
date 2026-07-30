@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { supabaseServer, isSupabaseServerConfigured } from "@/lib/supabase/server";
 import { cookies } from "next/headers";
 import { sendBookingStatusUpdateSMS } from "@/lib/sms";
-import { sendEmail } from "@/lib/mail";
+import { sendEmail, sendAdminBookingStatusUpdateEmail, sendAdminBookingCancelledEmail } from "@/lib/mail";
 
 const ADMIN_COOKIE = "iqfits_admin_token";
 const ADMIN_PASSCODE = process.env.ADMIN_PASSCODE;
@@ -98,7 +98,16 @@ export async function PATCH(req: NextRequest) {
 
     if (error) throw error;
 
-    // ── Notify client via SMS & Email on status change ────────────────────────
+    // ── Notify client & admin via SMS & Email on status change ────────────────
+    if (data) {
+      sendAdminBookingStatusUpdateEmail({
+        booking_ref: data.booking_ref,
+        full_name: data.full_name,
+        status: data.status,
+        notes: data.notes,
+      }).catch((e) => console.error("Admin booking status update Email notify error:", e));
+    }
+
     if (data?.phone) {
       sendBookingStatusUpdateSMS(data.phone, data.full_name, data.booking_ref, status).catch((e) =>
         console.error("Booking status SMS notify error:", e)
@@ -152,6 +161,14 @@ export async function DELETE(req: NextRequest) {
       .single();
 
     if (error) throw error;
+
+    if (data) {
+      sendAdminBookingCancelledEmail({
+        booking_ref: data.booking_ref,
+        full_name: data.full_name,
+        notes: data.notes,
+      }).catch((e) => console.error("Admin booking cancellation Email notify error:", e));
+    }
 
     if (data?.phone) {
       sendBookingStatusUpdateSMS(data.phone, data.full_name, data.booking_ref, "cancelled").catch((e) =>
